@@ -1,2 +1,13 @@
 
 Github invite link: https://github.com/BuddySwan/BrickBreaker/invitations
+
+Rubric:
+
+Moving the paddle around the screen with the arrow keys -5pts
+Moving the ball around the screen and bumping off walls and the paddle -5pts
+Utilizing an efficient data structure to handle the locations and states of all the bricks -10pts
+Handling collisions between bricks and the ball efficiently -5pts
+Creating a menu to pick different settings such as difficulty, visual changes, level select -5pts
+Develop powerups and make them change the state of the game (make the paddle bigger, duplicate the ball, increase lives, do more damage) -5pts
+Add a UI that keeps score tracks number of lives displays level and maybe other useful information -5pts
+

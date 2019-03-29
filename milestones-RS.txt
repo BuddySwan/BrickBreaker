@@ -11,3 +11,17 @@ Creating a menu to pick different settings such as difficulty, visual changes, l
 Develop powerups and make them change the state of the game (make the paddle bigger, duplicate the ball, increase lives, do more damage) -5pts
 Add a UI that keeps score tracks number of lives displays level and maybe other useful information -5pts
 
+Report: 
+So far I have been following the lazy foo tutorials and was working on loading images and getting keyboard input
+It was working fine at first but then when I tried to create a new project in xcode (since I am working on a mac) I tried to copy over my images and then both of the projects could not load the images. I spent over an hour trying to fix this problem. I found out that in xcode by default when adding an image it does not copy the image into the project it just stores a reference to it. This caused many problems. I got it to start working again but in the file that is in the repository I had to include the entire path for the image instead of just the project path. I hope to figure out how to fix this soon. 
+After fixing this I skipped ahead to the rendering geometry tutorial(8) and tried to get that to work. My goal was to make a rectangular paddle and have it move left and right based on arrow keys, and have a ball that bounced around the screen. I quickly found out I didn't have one of the files it needed me to include and as a result nothing worked.
+Over the next week I am going to spend more time learning how to use SDL and figuring out how to fix all my problems
+
+Timelog: 
+March 7: Downloaded and installed SDL and began working on the tutorials (Setting up a project and closing the window) -2hrs
+March 25: Worked through the images tutorial and learned how to add images -2hrs
+March 28: Worked on dealing with keyboard input rendering shapes to the window -4hrs
+
+
+
+

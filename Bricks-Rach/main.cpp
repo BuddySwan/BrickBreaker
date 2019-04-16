@@ -45,7 +45,7 @@ bool init(){
 }
 
 //these are all MY images which we can change later
-/*bool loadMedia(){
+bool loadMedia(){
     bool success = true;
     //PUT ME HERE
     if(!gPaddle.loadFromFile("Paddle.png", gRenderer)){
@@ -74,7 +74,8 @@ bool init(){
 		success = false;
 	}
     return success;	
-}*/
+}
+/* //I dont know how to get my images to load without the full file path
 bool loadMedia(){
     bool success = true;
     //PUT ME HERE
@@ -104,7 +105,7 @@ bool loadMedia(){
         success = false;
     }
     return success;
-}
+}*/
 
 void close(){
 	gPaddle.free();

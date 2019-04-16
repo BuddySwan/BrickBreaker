@@ -2,12 +2,13 @@
 
 //initializes x,y position and width and height. bricks are represented as essentially a
 //SDL_Rect. makes collsion easier adn everything else as well trust me
-Brick::Brick(int bx, int by, int bw, int bh){
+Brick::Brick(int bx, int by, int bw, int bh, int hits){
 	x = bx;
 	y = by;
 	w = bw;
 	h = bh;
 	hit = false;
+    hitsLeft = hits;
 	color = 'b';
 }
 
@@ -27,14 +28,14 @@ void Brick::takeHealth(){
 
 //renders correct color of brick
 void Brick::render(SDL_Renderer* gRenderer, LTexture& gBlueBrick, LTexture& gPurpleBrick, LTexture& gOrangeBrick){
-	switch(color){
-		case 'b':
+	switch(hitsLeft){
+		case 3:
 			gBlueBrick.render(gRenderer,x,y);
 			break;
-		case 'p':
+		case 2:
 			gPurpleBrick.render(gRenderer,x,y);
 			break;
-		case 'o':
+		case 1:
 			gOrangeBrick.render(gRenderer,x,y);
 			break;
 	}

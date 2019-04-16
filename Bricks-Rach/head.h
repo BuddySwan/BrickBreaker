@@ -1,5 +1,7 @@
 #include<SDL2/SDL.h>
-#include<SDL2/SDL_image.h>
+
+//#include<SDL2/SDL_image.h>
+#include<SDL2_image/SDL_image.h>
 #include<cstdio>
 #include<string>
 #include<vector>
@@ -35,12 +37,13 @@ class LTexture{
 
 class Brick{
  public:
-	Brick(int,int,int,int); //initializes x, y, width, height
+	Brick(int,int,int,int,int); //initializes x, y, width, height
 //	~Brick();
 	void takeHealth(); //takes health/changes color
 	void render(SDL_Renderer*, LTexture& Blue, LTexture& Purple, LTexture& Orange);
 	int x,y,w,h;
 	bool hit; //keeps track if hit
+    int hitsLeft;
 	char color;
 };
 
@@ -84,13 +87,17 @@ class Ball{
 	void setXY(int x, int y);
 
 	bool begin(SDL_Event &e); //controlls spacebar press that makes ball move
-	bool move(std::list<Brick* >& wall, Brick paddle, int& x, int& y);
+	bool move(std::list<Brick* >& wall, Paddle paddle, int& x, int& y);
 	void render(LTexture& obj, SDL_Renderer*);
 	void Set_Dimensions(int h, int w);
+    //checks the collision of the ball with a brick
+    bool checkCollide(Brick& brick);
+    bool checkPaddleHit(Paddle pad);
 
 	int Angle; //I havent done anything with this yet but if we wanted to calc real angle
 	int OB_HEIGHT;
 	int OB_WIDTH;
+    bool hitPaddle = false;
 
  private:
 	int mPosX, mPosY;
@@ -100,7 +107,7 @@ class Ball{
 };
 
 
-void addObject(std::list<Brick* >&, int, int, int, int);
+void addObject(std::list<Brick* >&, int, int, int, int, int);
 void createBricks(std::list<Brick* >&, int, int);
 void deleteBricks(std::list<Brick* >&);
 bool init();

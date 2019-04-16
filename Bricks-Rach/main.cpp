@@ -45,7 +45,7 @@ bool init(){
 }
 
 //these are all MY images which we can change later
-bool loadMedia(){
+/*bool loadMedia(){
     bool success = true;
     //PUT ME HERE
     if(!gPaddle.loadFromFile("Paddle.png", gRenderer)){
@@ -74,6 +74,36 @@ bool loadMedia(){
 		success = false;
 	}
     return success;	
+}*/
+bool loadMedia(){
+    bool success = true;
+    //PUT ME HERE
+    if(!gPaddle.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Paddle.png", gRenderer)){
+        printf("Failed ot load Me pic\n");
+        success = false;
+    }
+    //PUT BACKGROUND HERE
+    if(!gBackGround.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/background.png", gRenderer)){
+        printf("failed to load background\n");
+        success = false;
+    }
+    if(!gBall.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Dot.png", gRenderer)){
+        printf("failed to load ball\n");
+        success = false;
+    }
+    if(!gBlueBrick.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/BlueBrick.png", gRenderer)){
+        printf("failed to load blue\n");
+        success = false;
+    }
+    if(!gPurpleBrick.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/PurpleBrick.png", gRenderer)){
+        printf("failed to load purple\n");
+        success = false;
+    }
+    if(!gOrangeBrick.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/OrangeBrick.png", gRenderer)){
+        printf("failed to load orange\n");
+        success = false;
+    }
+    return success;
 }
 
 void close(){
@@ -106,13 +136,13 @@ int main(int argc, char* argv[]){
 			std::list<Brick* > bricks;
 			int pX = 300, pY = 450, bX = 330, bY = 385, sign_x = 1, sign_y = -1, brickW = gBlueBrick.getWidth(), brickH = gBlueBrick.getHeight();
 			Paddle Paddle(pX,pY,0,0); 
-			Ball Ball(bX,bY,5,5);
+			Ball Ball(bX,bY,3,3);
 			std::list<Brick* >::iterator lit;
 
 
 			//I am lazy and didn't feel like changing the collidedr to be general so i am 
 			//representing the paddle as a brick int he ball.move function. works the same
-			Brick pad(pX, pY, gPaddle.getWidth(), gPaddle.getHeight());
+			Brick pad(pX, pY, gPaddle.getWidth(), gPaddle.getHeight(),1000000);
 
 			Paddle.Set_Dimensions(gPaddle.getHeight(), gPaddle.getWidth());
 			Ball.Set_Dimensions(gBall.getHeight(), gBall.getHeight());
@@ -147,7 +177,7 @@ int main(int argc, char* argv[]){
 				
 				//move ball when spacebar is pressed, otherwise follow paddle
 				if(begin==true){
-					Lose_Life = Ball.move(bricks, pad, sign_x, sign_y);
+					Lose_Life = Ball.move(bricks, Paddle, sign_x, sign_y);
 				}else{
 					Ball.setXY(Paddle.getX()+30, Paddle.getY()-35);
 				}
@@ -169,7 +199,12 @@ int main(int argc, char* argv[]){
 					//render pic of brick
 					(*lit)->render(gRenderer,gBlueBrick, gPurpleBrick, gOrangeBrick);
 				}
-
+                
+                //recreates the bricks if all of them have been destroyed
+                //could be used in the future to start a new level
+                if(bricks.empty()){
+                    createBricks(bricks,brickW,brickH);
+                }
 			
 				//update screen
 				SDL_RenderPresent(gRenderer);

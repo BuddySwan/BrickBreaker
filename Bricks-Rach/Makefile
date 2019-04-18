@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -w -lSDL2 -lSDL2_image
+CFLAGS = -w -lSDL2 -lSDL2_image -lSDL2_ttf
 OBJFILES = Brick.o Paddle.o texture.o Ball.o helper.o main.o
 TARGET = Brick_Breaker
 

@@ -9,6 +9,9 @@ LTexture gBall;
 LTexture gBlueBrick;
 LTexture gPurpleBrick;
 LTexture gOrangeBrick;
+LTexture gTextTexture; //this is what says "Score: "
+LTexture gLives;
+LTexture gScoreNum;  //actual moving score 
 
 bool init(){
 	bool success = true;
@@ -17,28 +20,33 @@ bool init(){
 		printf("SDL could not initialize\n");
 		success = false;
 	}else{
-		if(!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY,"1")){
-			printf("Warning: linear texture filtering not enabled\n");
-		}
-		//create window
-		gWindow = SDL_CreateWindow("Brick Breaker 1.0\n",SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-		if(gWindow == NULL){
-			printf("Window could not be created\n");
+		if(TTF_Init()<0){
+			printf("SDL TTF could not initialize\n");
 			success = false;
 		}else{
-			gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-			if(gRenderer==NULL){
-				printf("Renderer could not be created\n");
+			if(!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY,"1")){
+				printf("Warning: linear texture filtering not enabled\n");
+			}
+			//create window
+			gWindow = SDL_CreateWindow("Brick Breaker 1.0\n",SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+			if(gWindow == NULL){
+			printf("Window could not be created\n");
 				success = false;
 			}else{
-				SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
-				int imgFlags = IMG_INIT_PNG;
-				if(!(IMG_Init(imgFlags)& imgFlags)){
-					printf("SDL_image could not initialize\n");
+				gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+				if(gRenderer==NULL){
+					printf("Renderer could not be created\n");
 					success = false;
+				}else{
+					SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+					int imgFlags = IMG_INIT_PNG;
+					if(!(IMG_Init(imgFlags)& imgFlags)){
+						printf("SDL_image could not initialize\n");
+						success = false;
+					}
 				}
-			}
 
+			}
 		}
 	}
 	return success;
@@ -53,10 +61,11 @@ bool loadMedia(){
         success = false;
     }
     //PUT BACKGROUND HERE
-    if(!gBackGround.loadFromFile("BackGround.png", gRenderer)){
+/*    if(!gBackGround.loadFromFile("BackGround.png", gRenderer)){
         printf("failed to load background\n");
         success = false;
     }
+*/
 	if(!gBall.loadFromFile("Dot.png", gRenderer)){
 		printf("failed to load ball\n");
 		success = false;
@@ -73,39 +82,12 @@ bool loadMedia(){
 		printf("failed to load orange\n");
 		success = false;
 	}
+	if(!gLives.loadFromFile("Lives.png", gRenderer)){
+		printf("failed to load hearts\n");
+		success = false;
+	}
     return success;	
 }
-/* //I dont know how to get my images to load without the full file path
-bool loadMedia(){
-    bool success = true;
-    //PUT ME HERE
-    if(!gPaddle.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Paddle.png", gRenderer)){
-        printf("Failed ot load Me pic\n");
-        success = false;
-    }
-    //PUT BACKGROUND HERE
-    if(!gBackGround.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/background.png", gRenderer)){
-        printf("failed to load background\n");
-        success = false;
-    }
-    if(!gBall.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Dot.png", gRenderer)){
-        printf("failed to load ball\n");
-        success = false;
-    }
-    if(!gBlueBrick.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/BlueBrick.png", gRenderer)){
-        printf("failed to load blue\n");
-        success = false;
-    }
-    if(!gPurpleBrick.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/PurpleBrick.png", gRenderer)){
-        printf("failed to load purple\n");
-        success = false;
-    }
-    if(!gOrangeBrick.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/OrangeBrick.png", gRenderer)){
-        printf("failed to load orange\n");
-        success = false;
-    }
-    return success;
-}*/
 
 void close(){
 	gPaddle.free();
@@ -131,25 +113,35 @@ int main(int argc, char* argv[]){
 		if(!loadMedia()){
 			printf("Failed to load media\n");
 		}else{			
-			
-			bool quit = false, Lose_Life = false, begin = false;
+
 			SDL_Event e;
-			std::list<Brick* > bricks;
-			int pX = 300, pY = 450, bX = 330, bY = 385, sign_x = 1, sign_y = -1, brickW = gBlueBrick.getWidth(), brickH = gBlueBrick.getHeight();
+
+			bool quit = false, Lose_Life = false, begin = false;
+			int pX = 300, pY = 450, bX = 330, bY = 385, brickW = gBlueBrick.getWidth(), brickH = gBlueBrick.getHeight(), score = 0;
+			std::string inputText = "Score: ", scoreNum;
+
+			std::stringstream buffer;
+
 			Paddle Paddle(pX,pY,0,0); 
-			Ball Ball(bX,bY,3,3);
+			Ball Ball(bX,bY,5,-5);
+	
+			std::list<Brick* > bricks;
 			std::list<Brick* >::iterator lit;
+	
 
+			//black text
+			SDL_Color textColor = {0,0,0, 0xFF};
 
-			//I am lazy and didn't feel like changing the collidedr to be general so i am 
-			//representing the paddle as a brick int he ball.move function. works the same
-			Brick pad(pX, pY, gPaddle.getWidth(), gPaddle.getHeight(),1000000);
+			TTF_Font* font = TTF_OpenFont("Roboto-Black.ttf",24);
+
+			gTextTexture.loadText(gRenderer, inputText, font);
+		
 
 			Paddle.Set_Dimensions(gPaddle.getHeight(), gPaddle.getWidth());
 			Ball.Set_Dimensions(gBall.getHeight(), gBall.getHeight());
-			
+
 			createBricks(bricks,brickW,brickH);
-			
+
 			while(!quit){
 
 				while(SDL_PollEvent(&e)!=0){
@@ -162,23 +154,26 @@ int main(int argc, char* argv[]){
 						begin = Ball.begin(e);
 					}
 				}
-				
-				Paddle.move();
 
-				pad.x = Paddle.getX();
-				pad.y = Paddle.getY();
+				//store int version of score into a string 
+//				buffer.clear();
+				buffer << Ball.Score;
+				buffer >> scoreNum;
+
+				gScoreNum.loadText(gRenderer, scoreNum, font);
+
+				Paddle.move();
 
 				if(Lose_Life==true){
 					Ball.setXY(bX, bY);
-					sign_x = 1;
-					sign_y = -1;
+					Ball.setV(5, -5);
 					begin = false;
 					Lose_Life = false;
 				}
-				
+
 				//move ball when spacebar is pressed, otherwise follow paddle
 				if(begin==true){
-					Lose_Life = Ball.move(bricks, Paddle, sign_x, sign_y);
+					Lose_Life = Ball.move(bricks, Paddle);
 				}else{
 					Ball.setXY(Paddle.getX()+30, Paddle.getY()-35);
 				}
@@ -190,33 +185,39 @@ int main(int argc, char* argv[]){
 				//render wall
 				SDL_SetRenderDrawColor(gRenderer,0x00,0x00,0x00,0xFF);
 
+
 				Paddle.render(gPaddle, gRenderer);
 				Ball.render(gBall, gRenderer);
 
-		
+
 				//render bricks
 				//Glitches have been solved!
 				for(lit = bricks.begin();lit!=bricks.end();lit++){
 					//render pic of brick
 					(*lit)->render(gRenderer,gBlueBrick, gPurpleBrick, gOrangeBrick);
 				}
-                
-                //recreates the bricks if all of them have been destroyed
-                //could be used in the future to start a new level
-                if(bricks.empty()){
-                    createBricks(bricks,brickW,brickH);
-                }
-			
-				//update screen
+
+				for(int i=0; i<Ball.Lives;i++){
+					gLives.render(gRenderer, 10 + gLives.getWidth()*i, 10);
+				}
+
+				gTextTexture.render(gRenderer, 500, 20);
+				gScoreNum.render(gRenderer, 600, 20);
+
+				/*
+				if(bricks.empty()){
+					createBricks(bricks,brickW,brickH);
+				}
+				*/
+
 				SDL_RenderPresent(gRenderer);
 			}
+
 			deleteBricks(bricks);
 		}
 	}
-	
+
 	close();
 	return 0;
 
 }
-
-

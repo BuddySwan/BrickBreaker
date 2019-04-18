@@ -38,25 +38,33 @@ bool LTexture::loadFromFile(std::string path, SDL_Renderer* gRenderer){
 
 }
 
-#ifdef _SDL_TTF_H
-bool LTexture::loadFromRenderedText(std::string textureText,SDL_Color textCOlor){
+bool LTexture::loadText(SDL_Renderer* gRenderer, std::string text, TTF_Font* font){
+	bool success = true;
+
 	free();
-	SDL_Surface* textSurface = TTF_RenderText_Solid(gFont, textureText.c_str();textColor);
-	if(textSurface!=NULL){
-		mTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
-		if(mTexture==NULL){
-			printf("Unable to create texture from rendered text\n");
-		}else{
-			mWidth = textSurface->w;
-			mHeight = text->Surface->h;
-		}
-		SDL_FreeSurface(textSurface);
+	if(font==NULL){
+		printf("couldn't open font");
+		success = false;
 	}else{
-		printf("Unable to render text surface\n");
+		SDL_Color Black = {0,0,0,0};
+		SDL_Surface* surfaceMessage = TTF_RenderText_Solid(font, text.c_str(), Black);
+		SDL_Texture* Message = SDL_CreateTextureFromSurface(gRenderer, surfaceMessage);
+	
+		if(Message==NULL){
+			printf("Message is NUll\n");
+			success = false;
+		}else{
+
+			mTexture = Message;
+			mWidth = surfaceMessage->w;
+			mHeight = surfaceMessage->h;
+
+			SDL_FreeSurface(surfaceMessage);
+		}
 	}
-	return mTexture != NULL;
+	return success;
 }
-#endif
+
 
 void LTexture::free(){
 	if(mTexture!=NULL){

@@ -1,11 +1,11 @@
 #include<SDL2/SDL.h>
-
 #include<SDL2/SDL_image.h>
-//#include<SDL2_image/SDL_image.h>
+#include<SDL2/SDL_ttf.h>
 #include<cstdio>
 #include<string>
 #include<vector>
 #include<list>
+#include<sstream>
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
@@ -15,10 +15,7 @@ class LTexture{
 	 LTexture();
 	 ~LTexture();
 	 bool loadFromFile(std::string path, SDL_Renderer*);
-#ifdef _SDL_TTF_H
-	 //creates image from font string
-	 bool loadFromRenderedText(std::string textureText, SDL_Color textColor);
-#endif
+	 bool loadText(SDL_Renderer* gRenderer, std::string,TTF_Font* Sans);
 	 void free();
 	 void setColor(Uint8 red, Uint8 gree, Uint8 blue);
 	 void setBlendMode(SDL_BlendMode blending);
@@ -38,12 +35,12 @@ class LTexture{
 class Brick{
  public:
 	Brick(int,int,int,int,int); //initializes x, y, width, height
-//	~Brick();
+
 	void takeHealth(); //takes health/changes color
 	void render(SDL_Renderer*, LTexture& Blue, LTexture& Purple, LTexture& Orange);
 	int x,y,w,h;
-	bool hit; //keeps track if hit
-    int hitsLeft;
+	int Life;
+	bool hit;
 	char color;
 };
 
@@ -61,7 +58,7 @@ class Paddle{
 	 void move(); //makes sure it only moves it left or right
 	 void render(LTexture& obj, SDL_Renderer*);
 	 void Set_Dimensions(int h, int w);
-	
+
 	 int Angle;
 	 int OB_HEIGHT;
 	 int OB_WIDTH;
@@ -82,22 +79,24 @@ class Ball{
 	//get x and y positions
 	int getX();
 	int getY();
+	void setV(int, int);
 
 	//resets X and Y position 
 	void setXY(int x, int y);
 
 	bool begin(SDL_Event &e); //controlls spacebar press that makes ball move
-	bool move(std::list<Brick* >& wall, Paddle paddle, int& x, int& y);
+	bool move(std::list<Brick* >& wall, Paddle paddle);
 	void render(LTexture& obj, SDL_Renderer*);
 	void Set_Dimensions(int h, int w);
-    //checks the collision of the ball with a brick
-    bool checkCollide(Brick& brick);
-    bool checkPaddleHit(Paddle pad);
 
-	int Angle; //I havent done anything with this yet but if we wanted to calc real angle
+	bool checkPaddleHit(Paddle);
+	bool checkCollide(Brick brick);
+
+	int Angle; 
 	int OB_HEIGHT;
 	int OB_WIDTH;
-    bool hitPaddle = false;
+	int Score;
+	int Lives;
 
  private:
 	int mPosX, mPosY;
@@ -107,13 +106,11 @@ class Ball{
 };
 
 
-void addObject(std::list<Brick* >&, int, int, int, int, int);
+void addObject(std::list<Brick* >&, int, int, int, int);
 void createBricks(std::list<Brick* >&, int, int);
 void deleteBricks(std::list<Brick* >&);
 bool init();
 bool loadMedia();
 void close();
 bool checkCollision(SDL_Rect a, Brick b);
-
-
 

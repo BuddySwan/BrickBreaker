@@ -1,4 +1,6 @@
 #include"head.h"
+#include<fstream>
+
 
 bool checkCollision( SDL_Rect a, Brick b )
 {
@@ -48,22 +50,37 @@ void addObject(std::list<Brick* >& objects, int x, int y, int w, int h, int hits
 	Brick *r = new Brick(x,y,w,h,hits);
 	objects.push_back(r);
 }
-
-void createBricks(std::list<Brick* >& objects,int w, int h){
-	/*addObject(objects, 0,0,w,h,3);
-	addObject(objects,w+1,h+1,w,h,3);
-	addObject(objects,2*w+1,2*h+1,w,h,3);
-	addObject(objects, 400, 0, w, h,3);
-	addObject(objects, 400, 100, w, h,3);
-	addObject(objects, 0, 200, w, h,3);
-	addObject(objects, 50, 200, w, h,3);
-	addObject(objects, w, 0, w, h,3);
-	addObject(objects, 300, 300, w, h,3);
-	addObject(objects, 150, 300, w, h,3);
-     */
+//creating files 1-5, will follow this format:
+//MAX_VEL (of ball)
+//x y hits (for all bricks in level)
+//might update it so that if hits=-1 its an unbreakble one
+void createBricks(std::list<Brick* >& objects, Ball& Ball, int Level, int w, int h){
     w += 3;
     h += 3;
-    addObject(objects, 2*w,4*h,w,h,3);
+	int x, y, hits;
+
+	std::ifstream fin;
+	std::string line;
+	std::istringstream buffer;
+
+	switch(Ball.Level){
+		case 1:
+			fin.open("Level1.txt");
+			break;
+	}
+	getline(fin,line);
+	buffer.clear();
+	buffer.str(line);
+	buffer >> Ball.MAX_VEL;
+
+	while(getline(fin,line)){
+		buffer.clear();
+		buffer.str(line);
+		buffer >> x >> y >> hits;
+		addObject(objects,x,y,w,h,hits);
+	}
+/*
+	addObject(objects, 2*w,4*h,w,h,3);
     addObject(objects, 3*w,4*h,w,h,3);
     addObject(objects, 4*w,4*h,w,h,3);
     addObject(objects, 5*w,4*h,w,h,3);
@@ -79,7 +96,7 @@ void createBricks(std::list<Brick* >& objects,int w, int h){
     addObject(objects, 4*w,6*h,w,h,3);
     addObject(objects, 5*w,6*h,w,h,3);
     addObject(objects, 6*w,6*h,w,h,3);
-    
+*/    
 
 
     
@@ -94,9 +111,15 @@ void deleteBricks(std::list<Brick* >&objects){
 	
 }
 
-void Reset(std::list<Brick* >& objects, Ball& ball, int w, int h){
+void Reset(std::list<Brick* >& objects, Ball& ball,Paddle& paddle, int w, int h){
 	deleteBricks(objects);
 	ball.Lives = 3;
 	ball.Score = 0;
-	createBricks(objects,w,h);
+	ball.setXY(SCREEN_WIDTH/2-ball.OB_WIDTH/2, SCREEN_HEIGHT - ball.OB_HEIGHT);
+	paddle.setXY(SCREEN_WIDTH/2-paddle.OB_WIDTH/2, SCREEN_HEIGHT - paddle.OB_HEIGHT);
+	ball.Level = 1;
+	if(ball.Score>ball.HighScore){
+		ball.HighScore = ball.Score;
+	}	
+	createBricks(objects, ball, ball.Level,w,h);
 }

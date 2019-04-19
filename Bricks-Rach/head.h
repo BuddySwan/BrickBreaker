@@ -6,9 +6,8 @@
 #include<vector>
 #include<list>
 #include<sstream>
-
 const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_HEIGHT = 600;
 
 //this is so multiple windows can pop up
 //i.e tutorial window, end game window
@@ -113,7 +112,6 @@ class Paddle{
 	 void handleEvent(SDL_Event& e);
 	 void move(); //makes sure it only moves it left or right
 	 void render(LTexture& obj, SDL_Renderer*);
-	 void Set_Dimensions(int h, int w);
 
 	 int Angle;
 	 int OB_HEIGHT;
@@ -143,7 +141,6 @@ class Ball{
 	bool begin(SDL_Event &e); //controlls spacebar press that makes ball move
 	bool move(std::list<Brick* >& wall, Paddle paddle);
 	void render(LTexture& obj, SDL_Renderer*);
-	void Set_Dimensions(int h, int w);
 
 	bool checkPaddleHit(Paddle);
 	bool checkCollide(Brick brick);
@@ -153,6 +150,9 @@ class Ball{
 	int OB_WIDTH;
 	int Score;
 	int Lives;
+	int HighScore;
+	int Level;
+	int MAX_VEL;
 
  private:
 	int mPosX, mPosY;
@@ -163,10 +163,10 @@ class Ball{
 
 
 void addObject(std::list<Brick* >&, int, int, int, int);
-void createBricks(std::list<Brick* >&, int, int);
+void createBricks(std::list<Brick* >&, Ball&, int, int, int);
 void deleteBricks(std::list<Brick* >&);
 bool init();
 bool loadMedia();
 void close();
 bool checkCollision(SDL_Rect a, Brick b);
-void Reset(std::list<Brick* >& bricks, Ball& ball, int w, int h);
+void Reset(std::list<Brick* >& bricks, Ball& ball,Paddle& paddle, int w, int h);

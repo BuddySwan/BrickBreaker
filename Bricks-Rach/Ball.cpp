@@ -2,12 +2,12 @@
 #include"head.h"
 #include<cmath>
 
-Ball::Ball(int x, int y, int vel_x, int vel_y){
-	OB_HEIGHT = 0;
-	OB_WIDTH = 0;
+Ball::Ball(int h, int w, int vel_x, int vel_y){
+	OB_HEIGHT = h;
+	OB_WIDTH = w;
     //Initialize the offsets
-	mPosX = x;
-	mPosY = y;
+	mPosX = SCREEN_WIDTH/2 - w/2;
+	mPosY = SCREEN_HEIGHT - h;
 
     //Set collision box dimension
     mCollider.w = OB_WIDTH;
@@ -19,6 +19,9 @@ Ball::Ball(int x, int y, int vel_x, int vel_y){
 
 	Lives = 3;
 	Score = 0;
+	HighScore = 0;
+	Level = 1;
+	MAX_VEL = 6;
 
 	Angle = -90;
 }
@@ -91,14 +94,6 @@ bool Ball::begin(SDL_Event& e){
 	return false;
 }
 
-void Ball::Set_Dimensions(int h, int w){
-	OB_HEIGHT = h;
-	OB_WIDTH = w;
-
-	mCollider.w = OB_WIDTH;
-	mCollider.h = OB_HEIGHT;
-}
-
 //moves ball and checks for collision. sign changes account for hitting wall or brick, and kept track of in program.
 //only handles a 90 degree turn at the moment, will make it better
 bool Ball::move(std::list<Brick* >& bricks, Paddle paddle){
@@ -119,7 +114,7 @@ bool Ball::move(std::list<Brick* >& bricks, Paddle paddle){
 		mCollider.x = mPosX;
 		mVelX = -mVelX;
 
-	}else if((mPosY < 0)){
+	}else if((mPosY < 70)){   //so it doesnt overlap the lives and score
 
 		mPosY -= mVelY;
 		mCollider.y = mPosY;
@@ -148,14 +143,14 @@ bool Ball::move(std::list<Brick* >& bricks, Paddle paddle){
 					
 					int m = 0;
 
-					if(mVelX < 0 && mVelX > -10){
+					if(mVelX < 0 && mVelX > -(MAX_VEL)){
 						m = -1;
-					}else if(mVelX > 0 && mVelX < 10){
+					}else if(mVelX > 0 && mVelX < MAX_VEL){
 						m = 1 ;
 					}
-					if(mVelY < 0 && mVelY > -10){
+					if(mVelY < 0 && mVelY > -(MAX_VEL)){
 						m = -1;
-					}else if(mVelY > 0 && mVelY < 10){
+					}else if(mVelY > 0 && mVelY < MAX_VEL){
 						m = 1;
 					}
 

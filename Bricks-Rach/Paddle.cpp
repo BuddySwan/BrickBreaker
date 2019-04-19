@@ -1,12 +1,12 @@
 //Paddle class
 #include"head.h"
 
-Paddle::Paddle(int x, int y, int vel_x, int vel_y){
-	OB_HEIGHT = 0;
-	OB_WIDTH = 0;
+Paddle::Paddle(int h, int w, int vel_x, int vel_y){
+	OB_HEIGHT = h;
+	OB_WIDTH = w;
     //Initialize the offsets
-	mPosX = x;
-	mPosY = y;
+	mPosX = SCREEN_WIDTH/2 - w/2;
+	mPosY = SCREEN_HEIGHT-h;
 
     //Set collision box dimension
     mCollider.w = OB_WIDTH;
@@ -66,14 +66,6 @@ void Paddle::handleEvent(SDL_Event& e){
 				break;
 		}
 	}
-}
-
-void Paddle::Set_Dimensions(int h, int w){
-	OB_HEIGHT = h;
-	OB_WIDTH = w;
-
-	mCollider.w = OB_WIDTH;
-	mCollider.h = OB_HEIGHT;
 }
 
 void Paddle::move(){

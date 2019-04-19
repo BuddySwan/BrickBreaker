@@ -148,13 +148,10 @@ int main(int argc, char* argv[]){
 			SDL_Event e;
 
 			bool quit = false, Lose_Life = false, begin = false, GameLost = false, endGame = false;
-			int pX = 300, pY = 450, bX = 330, bY = 385, brickW = gBlueBrick.getWidth(), brickH = gBlueBrick.getHeight(), score = 0;
+			int brickW = gBlueBrick.getWidth(), brickH = gBlueBrick.getHeight(), score = 0;
 			std::string inputText = "Score: ", scoreNum;
 
 			std::stringstream buffer;
-
-			Paddle Paddle(pX,pY,0,0); 
-			Ball Ball(bX,bY,5,-5);
 	
 			std::list<Brick* > bricks;
 			std::list<Brick* >::iterator lit;
@@ -169,11 +166,10 @@ int main(int argc, char* argv[]){
 			TTF_Font* finalFont = TTF_OpenFont("Roboto-Black.ttf", 36);
 
 
+			Paddle Paddle(gPaddle.getHeight(),gPaddle.getWidth(),0,0);
+			Ball Ball(gBall.getHeight(),gBall.getWidth(), 5, -5);
 
-			Paddle.Set_Dimensions(gPaddle.getHeight(), gPaddle.getWidth());
-			Ball.Set_Dimensions(gBall.getHeight(), gBall.getHeight());
-
-			createBricks(bricks,brickW,brickH);
+			createBricks(bricks,Ball, Ball.Level, brickW,brickH);
 
 			while(!quit){
 				
@@ -197,7 +193,7 @@ int main(int argc, char* argv[]){
 						GameLost = gLostWindow.handleEvent(e);
 						//reset game
 						if(GameLost==false){
-							Reset(bricks,Ball,brickW,brickH);
+							Reset(bricks,Ball,Paddle,brickW,brickH);
 							gLost.free();
 							gFinalScore.free();
 						}
@@ -228,7 +224,6 @@ int main(int argc, char* argv[]){
 					Paddle.move();
 
 					if(Lose_Life==true){
-						Ball.setXY(bX, bY);
 						Ball.setV(5, -5);
 						begin = false;
 						Lose_Life = false;

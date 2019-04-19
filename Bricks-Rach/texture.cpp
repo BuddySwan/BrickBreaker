@@ -38,7 +38,7 @@ bool LTexture::loadFromFile(std::string path, SDL_Renderer* gRenderer){
 
 }
 
-bool LTexture::loadText(SDL_Renderer* gRenderer, std::string text, TTF_Font* font){
+bool LTexture::loadText(SDL_Renderer* gRenderer, std::string text, TTF_Font* font, SDL_Color color){
 	bool success = true;
 
 	free();
@@ -46,8 +46,7 @@ bool LTexture::loadText(SDL_Renderer* gRenderer, std::string text, TTF_Font* fon
 		printf("couldn't open font");
 		success = false;
 	}else{
-		SDL_Color Black = {0,0,0,0};
-		SDL_Surface* surfaceMessage = TTF_RenderText_Solid(font, text.c_str(), Black);
+		SDL_Surface* surfaceMessage = TTF_RenderText_Solid(font, text.c_str(), color);
 		SDL_Texture* Message = SDL_CreateTextureFromSurface(gRenderer, surfaceMessage);
 	
 		if(Message==NULL){

@@ -171,11 +171,11 @@ void LWindow::render()
 	if( !mMinimized )
 	{	
 		//Clear screen
-		SDL_SetRenderDrawColor( mRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
-		SDL_RenderClear( mRenderer );
+//		SDL_SetRenderDrawColor( mRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
+//		SDL_RenderClear( mRenderer );
 
 		//Update screen
-		SDL_RenderPresent( mRenderer );
+//		SDL_RenderPresent( mRenderer );
 	}
 }
 

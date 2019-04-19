@@ -13,6 +13,7 @@ LTexture gTextTexture; //this is what says "Score: "
 LTexture gLives;
 LTexture gScoreNum;  //actual moving score 
 LTexture gLost;
+LTexture gFinalScore;
 
 bool init(){
 	bool success = true;
@@ -87,7 +88,34 @@ bool loadMedia(){
 		printf("failed to load hearts\n");
 		success = false;
 	}
-	
+	//I added new images so youll have to update those
+/*
+   if(!gPaddle.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Paddle.png", gRenderer)){
+        printf("Failed ot load Me pic\n");
+        success = false;
+    }
+    //PUT BACKGROUND HERE
+    if(!gBackGround.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/background.png", gRenderer)){
+        printf("failed to load background\n");
+        success = false;
+    }
+    if(!gBall.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Dot.png", gRenderer)){
+        printf("failed to load ball\n");
+        success = false;
+    }
+    if(!gBlueBrick.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/BlueBrick.png", gRenderer)){
+        printf("failed to load blue\n");
+        success = false;
+    }
+    if(!gPurpleBrick.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/PurpleBrick.png", gRenderer)){
+        printf("failed to load purple\n");
+        success = false;
+    }
+    if(!gOrangeBrick.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/OrangeBrick.png", gRenderer)){
+        printf("failed to load orange\n");
+        success = false;
+    }
+*/
     return success;	
 }
 
@@ -134,10 +162,13 @@ int main(int argc, char* argv[]){
 			//Lost window, will put image in later
 			LWindow gLostWindow;
 
-			//score display
+			//for displaying score
+			SDL_Color Black = {0,0,0,0}, White = {255,255,255,255};
 			TTF_Font* font = TTF_OpenFont("Roboto-Black.ttf",24);
-			gTextTexture.loadText(gRenderer, inputText, font);
-		
+			gTextTexture.loadText(gRenderer, inputText, font, Black);	
+			TTF_Font* finalFont = TTF_OpenFont("Roboto-Black.ttf", 36);
+
+
 
 			Paddle.Set_Dimensions(gPaddle.getHeight(), gPaddle.getWidth());
 			Ball.Set_Dimensions(gBall.getHeight(), gBall.getHeight());
@@ -146,10 +177,16 @@ int main(int argc, char* argv[]){
 
 			while(!quit){
 				
+				//turn int score into string so it can be rendered
+		        buffer.clear();
+                buffer << Ball.Score;
+                buffer >> scoreNum;
+
 				//load losing window
 				if(Ball.Lives==0 && GameLost==false){
 					gLostWindow.init();
 					gLost.loadFromFile("lost.png", gLostWindow.mRenderer);
+					gFinalScore.loadText(gLostWindow.mRenderer, scoreNum, finalFont, White);
 					GameLost = true;
 				}
 
@@ -162,6 +199,7 @@ int main(int argc, char* argv[]){
 						if(GameLost==false){
 							Reset(bricks,Ball,brickW,brickH);
 							gLost.free();
+							gFinalScore.free();
 						}
 					}else{
 						if(e.type==SDL_QUIT){
@@ -174,74 +212,68 @@ int main(int argc, char* argv[]){
 					}
 					
 				}
-				//keeps losing window in focus
+				//if game is lost a new window pops up. it can be turned into a tutorial window or we can keep it 
+				//as is.
 				if(GameLost==true){
 					gLostWindow.focus();
-				}
-
-				//store int version of score into a string 
-				buffer.clear();
-				buffer << Ball.Score;
-				buffer >> scoreNum;
-
-				gScoreNum.loadText(gRenderer, scoreNum, font);
-
-				Paddle.move();
-
-				if(Lose_Life==true){
-					Ball.setXY(bX, bY);
-					Ball.setV(5, -5);
-					begin = false;
-					Lose_Life = false;
-				}
-
-				//move ball when spacebar is pressed, otherwise follow paddle
-				if(begin==true){
-					Lose_Life = Ball.move(bricks, Paddle);
+					SDL_SetRenderDrawColor(gLostWindow.mRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
+					SDL_RenderClear(gLostWindow.mRenderer);
+                    gLostWindow.renderImage(gLost,0,0);
+                    gLostWindow.renderImage(gFinalScore,150,70);
+					SDL_RenderPresent(gLostWindow.mRenderer);
 				}else{
-					Ball.setXY(Paddle.getX()+30, Paddle.getY()-35);
-				}
+
+					gScoreNum.loadText(gRenderer, scoreNum, font, Black);
+
+					Paddle.move();
+
+					if(Lose_Life==true){
+						Ball.setXY(bX, bY);
+						Ball.setV(5, -5);
+						begin = false;
+						Lose_Life = false;
+					}
+
+					//move ball when spacebar is pressed, otherwise follow paddle
+					if(begin==true){
+						Lose_Life = Ball.move(bricks, Paddle);
+					}else{
+						Ball.setXY(Paddle.getX()+30, Paddle.getY()-35);
+					}
 
 		
-				SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
-				SDL_RenderClear(gRenderer);
-				SDL_SetRenderDrawColor(gRenderer,0x00,0x00,0x00,0xFF);
+					SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+					SDL_RenderClear(gRenderer);
+					SDL_SetRenderDrawColor(gRenderer,0x00,0x00,0x00,0xFF);
 
 
-				Paddle.render(gPaddle, gRenderer);
-				Ball.render(gBall, gRenderer);
+					Paddle.render(gPaddle, gRenderer);
+					Ball.render(gBall, gRenderer);
 
 
-				//render bricks
-				for(lit = bricks.begin();lit!=bricks.end();lit++){
-					//render pic of brick
-					(*lit)->render(gRenderer,gBlueBrick, gPurpleBrick, gOrangeBrick);
-				}
+					//render bricks
+					for(lit = bricks.begin();lit!=bricks.end();lit++){
+						//render pic of brick
+						(*lit)->render(gRenderer,gBlueBrick, gPurpleBrick, gOrangeBrick);
+					}
 
-				for(int i=0; i<Ball.Lives;i++){
-					gLives.render(gRenderer, 10 + gLives.getWidth()*i, 10);
-				}
+					for(int i=0; i<Ball.Lives;i++){
+						gLives.render(gRenderer, 10 + gLives.getWidth()*i, 10);
+					}
+	
+					gTextTexture.render(gRenderer, 500, 20);
+					gScoreNum.render(gRenderer, 600, 20);
 
-				gTextTexture.render(gRenderer, 500, 20);
-				gScoreNum.render(gRenderer, 600, 20);
+					/*
+					if(bricks.empty()){
+						createBricks(bricks,brickW,brickH);
+					}
+					*/
 
-				if(GameLost==true){
-					SDL_RenderClear(gLostWindow.mRenderer);
-					gLostWindow.render();
-					gLostWindow.renderImage(gLost,0,0);
-					SDL_RenderPresent(gLostWindow.mRenderer);
-				}
+					SDL_RenderPresent(gRenderer);
+				}//game over 
 
-				/*
-				if(bricks.empty()){
-					createBricks(bricks,brickW,brickH);
-				}
-				*/
-
-				SDL_RenderPresent(gRenderer);
-				
-
-			}
+			}//while
 
 			deleteBricks(bricks);
 		}

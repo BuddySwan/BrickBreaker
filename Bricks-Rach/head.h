@@ -10,6 +10,9 @@
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
+//this is so multiple windows can pop up
+//i.e tutorial window, end game window
+//idk looks cool
 class LWindow
 {
     public:
@@ -68,7 +71,7 @@ class LTexture{
 	 LTexture();
 	 ~LTexture();
 	 bool loadFromFile(std::string path, SDL_Renderer*);
-	 bool loadText(SDL_Renderer* gRenderer, std::string,TTF_Font* Sans);
+	 bool loadText(SDL_Renderer* gRenderer, std::string,TTF_Font* font, SDL_Color color);
 	 void free();
 	 void setColor(Uint8 red, Uint8 gree, Uint8 blue);
 	 void setBlendMode(SDL_BlendMode blending);

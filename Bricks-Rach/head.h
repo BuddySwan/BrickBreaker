@@ -10,6 +10,59 @@
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
+class LWindow
+{
+    public:
+        //Intializes internals
+        LWindow();
+
+        //Creates window
+        bool init();
+
+        //Handles window events
+        bool handleEvent( SDL_Event& e );
+
+        //Focuses on window
+        void focus();
+
+        //Shows windows contents
+        void render();
+		void renderImage(class LTexture&, int x, int y);
+
+        //Deallocates internals
+        void free();
+
+        //Window dimensions
+        int getWidth();
+        int getHeight();
+
+
+        //Window focii
+        bool hasMouseFocus();
+        bool hasKeyboardFocus();
+        bool isMinimized();
+        bool isShown();
+
+		SDL_Renderer* mRenderer;
+
+    private:
+        //Window data
+        SDL_Window* mWindow;
+       // SDL_Renderer* mRenderer;
+        int mWindowID;
+
+        //Window dimensions
+        int mWidth;
+        int mHeight;
+
+        //Window focus
+        bool mMouseFocus;
+        bool mKeyboardFocus;
+        bool mFullScreen;
+        bool mMinimized;
+        bool mShown;
+};
+
 class LTexture{
  public:
 	 LTexture();
@@ -113,4 +166,4 @@ bool init();
 bool loadMedia();
 void close();
 bool checkCollision(SDL_Rect a, Brick b);
-
+void Reset(std::list<Brick* >& bricks, Ball& ball, int w, int h);

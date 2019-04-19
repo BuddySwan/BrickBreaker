@@ -88,8 +88,15 @@ void createBricks(std::list<Brick* >& objects,int w, int h){
 void deleteBricks(std::list<Brick* >&objects){
 	std::list<Brick* >::iterator lit;
 	for(lit=objects.begin();lit!=objects.end();lit++){
-		delete (*lit);
+//		delete (*lit);
+		lit = objects.erase(lit);
 	}
 	
 }
 
+void Reset(std::list<Brick* >& objects, Ball& ball, int w, int h){
+	deleteBricks(objects);
+	ball.Lives = 3;
+	ball.Score = 0;
+	createBricks(objects,w,h);
+}

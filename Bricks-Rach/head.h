@@ -133,13 +133,15 @@ class Ball{
 	//get x and y positions
 	int getX();
 	int getY();
-	void setV(int, int);
-
+	void setV(int, int); //set velocity
 	//resets X and Y position 
 	void setXY(int x, int y);
+	
+	void SetAngle();  //actively changes the velocity based on angle
+	void ChangeAngle(SDL_Event& e); //handles event to change control with Q and W
 
 	bool begin(SDL_Event &e); //controlls spacebar press that makes ball move
-	bool move(std::list<Brick* >& wall, Paddle paddle);
+	bool move(std::list<Brick* >& wall, std::list<Brick* >& statics, Paddle paddle);
 	void render(LTexture& obj, SDL_Renderer*);
 
 	bool checkPaddleHit(Paddle);
@@ -163,10 +165,10 @@ class Ball{
 
 
 void addObject(std::list<Brick* >&, int, int, int, int);
-void createBricks(std::list<Brick* >&, Ball&, int, int, int);
+void createBricks(std::list<Brick* >&, std::list<Brick* >&, Ball&, int, int, int);
 void deleteBricks(std::list<Brick* >&);
 bool init();
 bool loadMedia();
 void close();
 bool checkCollision(SDL_Rect a, Brick b);
-void Reset(std::list<Brick* >& bricks, Ball& ball,Paddle& paddle, int w, int h);
+void Reset(std::list<Brick* >& bricks, std::list<Brick* >& statics, Ball& ball,Paddle& paddle, int w, int h);

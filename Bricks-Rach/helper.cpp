@@ -54,7 +54,7 @@ void addObject(std::list<Brick* >& objects, int x, int y, int w, int h, int hits
 //MAX_VEL (of ball)
 //x y hits (for all bricks in level)
 //might update it so that if hits=-1 its an unbreakble one
-void createBricks(std::list<Brick* >& objects, Ball& Ball, int Level, int w, int h){
+void createBricks(std::list<Brick* >& objects, std::list<Brick* >& staticBricks, Ball& Ball, int Level, int w, int h){
     w += 3;
     h += 3;
 	int x, y, hits;
@@ -67,6 +67,9 @@ void createBricks(std::list<Brick* >& objects, Ball& Ball, int Level, int w, int
 		case 1:
 			fin.open("Level1.txt");
 			break;
+		case 2:
+			fin.open("Level2.txt");
+			break;
 	}
 	getline(fin,line);
 	buffer.clear();
@@ -77,7 +80,11 @@ void createBricks(std::list<Brick* >& objects, Ball& Ball, int Level, int w, int
 		buffer.clear();
 		buffer.str(line);
 		buffer >> x >> y >> hits;
-		addObject(objects,x,y,w,h,hits);
+		if(hits==-1){
+			addObject(staticBricks,x,y,w,h,hits);
+		}else{
+			addObject(objects,x,y,w,h,hits);
+		}
 	}
 /*
 	addObject(objects, 2*w,4*h,w,h,3);
@@ -105,21 +112,22 @@ void createBricks(std::list<Brick* >& objects, Ball& Ball, int Level, int w, int
 void deleteBricks(std::list<Brick* >&objects){
 	std::list<Brick* >::iterator lit;
 	for(lit=objects.begin();lit!=objects.end();lit++){
-//		delete (*lit);
 		lit = objects.erase(lit);
 	}
 	
 }
 
-void Reset(std::list<Brick* >& objects, Ball& ball,Paddle& paddle, int w, int h){
+void Reset(std::list<Brick* >& objects, std::list<Brick* >& statics, Ball& ball,Paddle& paddle, int w, int h){
 	deleteBricks(objects);
+	deleteBricks(statics);
+
 	ball.Lives = 3;
 	ball.Score = 0;
-	ball.setXY(SCREEN_WIDTH/2-ball.OB_WIDTH/2, SCREEN_HEIGHT - ball.OB_HEIGHT);
-	paddle.setXY(SCREEN_WIDTH/2-paddle.OB_WIDTH/2, SCREEN_HEIGHT - paddle.OB_HEIGHT);
+	ball.Angle = 45;
 	ball.Level = 1;
-	if(ball.Score>ball.HighScore){
-		ball.HighScore = ball.Score;
-	}	
-	createBricks(objects, ball, ball.Level,w,h);
+
+	//ball.setXY(SCREEN_WIDTH/2-ball.OB_WIDTH/2, SCREEN_HEIGHT - ball.OB_HEIGHT);
+	paddle.setXY(SCREEN_WIDTH/2-paddle.OB_WIDTH/2, SCREEN_HEIGHT - paddle.OB_HEIGHT);
+	
+	createBricks(objects, statics, ball, ball.Level,w,h);
 }

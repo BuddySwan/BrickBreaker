@@ -23,7 +23,7 @@ Ball::Ball(int h, int w, int vel_x, int vel_y){
 	Level = 1;
 	MAX_VEL = 6;
 
-	Angle = -90;
+	Angle = 45;
 }
 
 int Ball::getX(){
@@ -43,34 +43,42 @@ void Ball::setXY(int x, int y){
 	mPosX = x;
 	mPosY = y;
 }
-/*
+
+//maybe my EF days have finally left me bc its not working
 void Ball::SetAngle(){
 	int vY = mVelY, vX = mVelX;
-	double ang = tan((M_PI*Angle)/180);
-	mVelY = (vX * ang);
-	mVelX = (vY / ang);
-//	mVelY = 10;
-//	mVelX = 12;
+	double tanA = tan((M_PI*Angle)/180);
+
+	//for some reason the tan function is STRUGGLING to calculate tan(90) so I 
+	//did it manually
+/*	if(Angle==90){  
+		mVelX = 0;
+	}else if(Angle==0 || Angle==180){
+		mVelY = 0;
+	}else{
+		mVelY = (vX * tanA);
+		mVelX = (vY / tanA);
+	}*/
 }
 
 void Ball::ChangeAngle(SDL_Event& e){
 	if(e.type == SDL_KEYDOWN && e.key.repeat == 0){
 		if(e.key.keysym.sym == SDLK_q){
-			if(Angle>-90){
+			if(Angle>0){
 				Angle -= OB_VEL;
 			}
 		}else if(e.key.keysym.sym == SDLK_w){
-			if(Angle<90){
+			if(Angle<180){
 				Angle += OB_VEL;
 			}
 		}
 	}else if(e.type == SDL_KEYUP && e.key.repeat == 0){
 		if(e.key.keysym.sym == SDLK_q){
-			if(Angle>-90){
+			if(Angle>0){
 				Angle -= OB_VEL;
 			}
 		}else if(e.key.keysym.sym == SDLK_w){
-			if(Angle<90){
+			if(Angle<180){
 				Angle += OB_VEL;
 			}
 		}
@@ -78,7 +86,7 @@ void Ball::ChangeAngle(SDL_Event& e){
 //	SetAngle();
 
 }
-*/
+
 
 //handles reset. ball only starts moving when spacebar is pressed
 bool Ball::begin(SDL_Event& e){
@@ -96,7 +104,7 @@ bool Ball::begin(SDL_Event& e){
 
 //moves ball and checks for collision. sign changes account for hitting wall or brick, and kept track of in program.
 //only handles a 90 degree turn at the moment, will make it better
-bool Ball::move(std::list<Brick* >& bricks, Paddle paddle){
+bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, Paddle paddle){
 	std::list<Brick* >::iterator lit;
 
 	//Move the dot left or right
@@ -131,6 +139,18 @@ bool Ball::move(std::list<Brick* >& bricks, Paddle paddle){
 		return true;
 
     }else{
+		//check if hit with static brick
+		 for(lit = staticBricks.begin();lit != staticBricks.end(); lit++){
+			if(checkCollide(*(*lit))){
+				mPosX -= mVelX;
+				mPosY -= mVelY;
+
+				mVelX = -(mVelX);
+				mVelY = -(mVelY);
+
+				return false;
+			}
+		 }
 		 for(lit = bricks.begin();lit != bricks.end(); lit++){
 
 		    if(checkCollide(*(*lit))){

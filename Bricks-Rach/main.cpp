@@ -9,11 +9,14 @@ LTexture gBall;
 LTexture gBlueBrick;
 LTexture gPurpleBrick;
 LTexture gOrangeBrick;
+LTexture gStaticBrick;
 LTexture gTextTexture; //this is what says "Score: "
 LTexture gLives;
 LTexture gScoreNum;  //actual moving score 
 LTexture gLost;
 LTexture gFinalScore;
+LTexture gAngleLine;
+LTexture gHighScore;
 
 bool init(){
 	bool success = true;
@@ -54,20 +57,19 @@ bool init(){
 	return success;
 }
 
-//these are all MY images which we can change later
+
 bool loadMedia(){
     bool success = true;
-    //PUT ME HERE
+
     if(!gPaddle.loadFromFile("Paddle.png", gRenderer)){
         printf("Failed ot load Me pic\n");
         success = false;
     }
-    //PUT BACKGROUND HERE
-/*    if(!gBackGround.loadFromFile("BackGround.png", gRenderer)){
+    if(!gBackGround.loadFromFile("BackGround.png", gRenderer)){
         printf("failed to load background\n");
         success = false;
     }
-*/
+
 	if(!gBall.loadFromFile("Dot.png", gRenderer)){
 		printf("failed to load ball\n");
 		success = false;
@@ -84,8 +86,16 @@ bool loadMedia(){
 		printf("failed to load orange\n");
 		success = false;
 	}
+	if(!gStaticBrick.loadFromFile("StaticBrick.png",gRenderer)){
+		printf("failed to load static\n");
+		success = false;
+	}
 	if(!gLives.loadFromFile("Lives.png", gRenderer)){
 		printf("failed to load hearts\n");
+		success = false;
+	}
+	if(!gAngleLine.loadFromFile("Line.png", gRenderer)){
+		printf("failed to load line\n");
 		success = false;
 	}
 	//I added new images so youll have to update those
@@ -126,6 +136,8 @@ void close(){
 	gBlueBrick.free();
 	gPurpleBrick.free();
 	gOrangeBrick.free();
+	gLives.free();
+	gAngleLine.free();
 	
 	SDL_DestroyRenderer(gRenderer);
 	SDL_DestroyWindow(gWindow);
@@ -149,11 +161,11 @@ int main(int argc, char* argv[]){
 
 			bool quit = false, Lose_Life = false, begin = false, GameLost = false, endGame = false;
 			int brickW = gBlueBrick.getWidth(), brickH = gBlueBrick.getHeight(), score = 0;
-			std::string inputText = "Score: ", scoreNum;
+			std::string inputText = "Score: ", scoreNum, highScore;
 
 			std::stringstream buffer;
 	
-			std::list<Brick* > bricks;
+			std::list<Brick* > bricks, staticBricks;
 			std::list<Brick* >::iterator lit;
 
 			//Lost window, will put image in later
@@ -161,15 +173,15 @@ int main(int argc, char* argv[]){
 
 			//for displaying score
 			SDL_Color Black = {0,0,0,0}, White = {255,255,255,255};
-			TTF_Font* font = TTF_OpenFont("Roboto-Black.ttf",24);
-			gTextTexture.loadText(gRenderer, inputText, font, Black);	
-			TTF_Font* finalFont = TTF_OpenFont("Roboto-Black.ttf", 36);
+			TTF_Font* font = TTF_OpenFont("Roboto-Black.ttf",24);	
+			TTF_Font* finalFont = TTF_OpenFont("Roboto-Black.ttf", 30);
 
+			gTextTexture.loadText(gRenderer,inputText,font, White);
 
 			Paddle Paddle(gPaddle.getHeight(),gPaddle.getWidth(),0,0);
 			Ball Ball(gBall.getHeight(),gBall.getWidth(), 5, -5);
 
-			createBricks(bricks,Ball, Ball.Level, brickW,brickH);
+			createBricks(bricks, staticBricks, Ball, Ball.Level, brickW,brickH);
 
 			while(!quit){
 				
@@ -183,6 +195,18 @@ int main(int argc, char* argv[]){
 					gLostWindow.init();
 					gLost.loadFromFile("lost.png", gLostWindow.mRenderer);
 					gFinalScore.loadText(gLostWindow.mRenderer, scoreNum, finalFont, White);
+
+					//set high score
+					if(Ball.Score > Ball.HighScore){
+						Ball.HighScore = Ball.Score;
+					}
+
+					buffer.clear();
+					buffer << Ball.HighScore;
+					buffer >> highScore;
+
+
+					gHighScore.loadText(gLostWindow.mRenderer, highScore, finalFont, White);
 					GameLost = true;
 				}
 
@@ -193,33 +217,37 @@ int main(int argc, char* argv[]){
 						GameLost = gLostWindow.handleEvent(e);
 						//reset game
 						if(GameLost==false){
-							Reset(bricks,Ball,Paddle,brickW,brickH);
+							Reset(bricks,staticBricks,Ball,Paddle,brickW,brickH);
 							gLost.free();
 							gFinalScore.free();
+							gHighScore.free();
 						}
 					}else{
 						if(e.type==SDL_QUIT){
 							quit = true;
 						}
+						
 						Paddle.handleEvent(e);
+					
 						if(begin==false){
 							begin = Ball.begin(e);
+//							Ball.ChangeAngle(e);
 						}
 					}
 					
 				}
 				//if game is lost a new window pops up. it can be turned into a tutorial window or we can keep it 
-				//as is.
 				if(GameLost==true){
 					gLostWindow.focus();
 					SDL_SetRenderDrawColor(gLostWindow.mRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
 					SDL_RenderClear(gLostWindow.mRenderer);
                     gLostWindow.renderImage(gLost,0,0);
-                    gLostWindow.renderImage(gFinalScore,150,70);
+                    gLostWindow.renderImage(gFinalScore,130,80);
+					gLostWindow.renderImage(gHighScore,137,115);
 					SDL_RenderPresent(gLostWindow.mRenderer);
 				}else{
 
-					gScoreNum.loadText(gRenderer, scoreNum, font, Black);
+					gScoreNum.loadText(gRenderer, scoreNum, font, White);
 
 					Paddle.move();
 
@@ -231,9 +259,9 @@ int main(int argc, char* argv[]){
 
 					//move ball when spacebar is pressed, otherwise follow paddle
 					if(begin==true){
-						Lose_Life = Ball.move(bricks, Paddle);
+						Lose_Life = Ball.move(bricks, staticBricks, Paddle);
 					}else{
-						Ball.setXY(Paddle.getX()+30, Paddle.getY()-35);
+						Ball.setXY(Paddle.getX()+35, Paddle.getY()-30);
 					}
 
 		
@@ -241,15 +269,23 @@ int main(int argc, char* argv[]){
 					SDL_RenderClear(gRenderer);
 					SDL_SetRenderDrawColor(gRenderer,0x00,0x00,0x00,0xFF);
 
+					gBackGround.render(gRenderer,0,0);
 
+					//change launch angle the setAngle funct. isnt working though
+				//	if(begin==false){
+				//		gAngleLine.render(gRenderer,Ball.getX()-Ball.OB_WIDTH/2,Ball.getY()-Ball.OB_HEIGHT/2,NULL, Ball.Angle);
+				//	}
+				
 					Paddle.render(gPaddle, gRenderer);
 					Ball.render(gBall, gRenderer);
 
 
 					//render bricks
 					for(lit = bricks.begin();lit!=bricks.end();lit++){
-						//render pic of brick
 						(*lit)->render(gRenderer,gBlueBrick, gPurpleBrick, gOrangeBrick);
+					}
+					for(lit = staticBricks.begin();lit!=staticBricks.end();lit++){
+						gStaticBrick.render(gRenderer,(*lit)->x, (*lit)->y);
 					}
 
 					for(int i=0; i<Ball.Lives;i++){
@@ -259,11 +295,15 @@ int main(int argc, char* argv[]){
 					gTextTexture.render(gRenderer, 500, 20);
 					gScoreNum.render(gRenderer, 600, 20);
 
-					/*
+					
 					if(bricks.empty()){
-						createBricks(bricks,brickW,brickH);
+						deleteBricks(staticBricks);
+						Ball.Level++;
+						begin = false;
+
+						createBricks(bricks, staticBricks, Ball, brickW, brickH, 3);
 					}
-					*/
+					
 
 					SDL_RenderPresent(gRenderer);
 				}//game over 

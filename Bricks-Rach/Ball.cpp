@@ -142,10 +142,8 @@ bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, Pa
 		//check if hit with static brick
 		 for(lit = staticBricks.begin();lit != staticBricks.end(); lit++){
 			if(checkCollide(*(*lit))){
-				mPosX -= mVelX;
+				
 				mPosY -= mVelY;
-
-				mVelX = -(mVelX);
 				mVelY = -(mVelY);
 
 				return false;
@@ -156,7 +154,7 @@ bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, Pa
 		    if(checkCollide(*(*lit))){
 		
 				if((*lit)->hit==false){ 
-					mPosX -= mVelX;
+
 					mPosY -= mVelY;
 
 					mCollider.x= mPosX;
@@ -174,7 +172,6 @@ bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, Pa
 						m = 1;
 					}
 
-					mVelX = -(mVelX + m);
 					mVelY = -(mVelY + m);
 
 					(*lit)->takeHealth();

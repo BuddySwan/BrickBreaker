@@ -6,6 +6,7 @@
 #include<vector>
 #include<list>
 #include<sstream>
+
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 600;
 
@@ -97,6 +98,9 @@ class Brick{
 	int Life;
 	bool hit;
 	char color;
+
+	//power ups
+	bool PWRLife;
 };
 
 class Paddle{
@@ -144,8 +148,8 @@ class Ball{
 	bool move(std::list<Brick* >& wall, std::list<Brick* >& statics, Paddle paddle);
 	void render(LTexture& obj, SDL_Renderer*);
 
-	bool checkPaddleHit(Paddle);
-	bool checkCollide(Brick brick);
+	bool checkPaddleHit(Paddle, bool&, bool&);
+	bool checkCollide(Brick brick, bool&, bool&);
 
 	int Angle; 
 	int OB_HEIGHT;
@@ -164,7 +168,7 @@ class Ball{
 };
 
 
-void addObject(std::list<Brick* >&, int, int, int, int);
+void addObject(std::list<Brick* >&, int, int, int, int, std::string);
 void createBricks(std::list<Brick* >&, std::list<Brick* >&, Ball&, int, int, int);
 void deleteBricks(std::list<Brick* >&);
 bool init();

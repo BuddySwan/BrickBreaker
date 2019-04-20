@@ -45,11 +45,19 @@ bool checkCollision( SDL_Rect a, Brick b )
     //If none of the sides from A are outside B
     return true;
 }
+
+
 //function to turn object into sdl_rect and add to object vector
-void addObject(std::list<Brick* >& objects, int x, int y, int w, int h, int hits){
+void addObject(std::list<Brick* >& objects, int x, int y, int w, int h, int hits, std::string PowerUp){
 	Brick *r = new Brick(x,y,w,h,hits);
+
+	if(PowerUp=="PWRLife"){
+		r->PWRLife = true;
+	}
 	objects.push_back(r);
 }
+
+
 //creating files 1-5, will follow this format:
 //MAX_VEL (of ball)
 //x y hits (for all bricks in level)
@@ -81,9 +89,11 @@ void createBricks(std::list<Brick* >& objects, std::list<Brick* >& staticBricks,
 		buffer.str(line);
 		buffer >> x >> y >> hits;
 		if(hits==-1){
-			addObject(staticBricks,x,y,w,h,hits);
+			addObject(staticBricks,x,y,w,h,hits,"");
+		}else if(hits==-2){
+			addObject(objects,x,y,w,h,1,"PWRLife");	
 		}else{
-			addObject(objects,x,y,w,h,hits);
+			addObject(objects,x,y,w,h,hits,"");
 		}
 	}
 /*
@@ -126,7 +136,6 @@ void Reset(std::list<Brick* >& objects, std::list<Brick* >& statics, Ball& ball,
 	ball.Angle = 45;
 	ball.Level = 1;
 
-	//ball.setXY(SCREEN_WIDTH/2-ball.OB_WIDTH/2, SCREEN_HEIGHT - ball.OB_HEIGHT);
 	paddle.setXY(SCREEN_WIDTH/2-paddle.OB_WIDTH/2, SCREEN_HEIGHT - paddle.OB_HEIGHT);
 	
 	createBricks(objects, statics, ball, ball.Level,w,h);

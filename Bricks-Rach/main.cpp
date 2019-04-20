@@ -10,6 +10,7 @@ LTexture gBlueBrick;
 LTexture gPurpleBrick;
 LTexture gOrangeBrick;
 LTexture gStaticBrick;
+LTexture gLifeBrick;
 LTexture gTextTexture; //this is what says "Score: "
 LTexture gLives;
 LTexture gScoreNum;  //actual moving score 
@@ -86,6 +87,10 @@ bool loadMedia(){
 		printf("failed to load orange\n");
 		success = false;
 	}
+	if(!gLifeBrick.loadFromFile("LifeBrick.png", gRenderer)){
+		printf("failed to load life brick\n");
+		success = false;
+	}
 	if(!gStaticBrick.loadFromFile("StaticBrick.png",gRenderer)){
 		printf("failed to load static\n");
 		success = false;
@@ -136,6 +141,7 @@ void close(){
 	gBlueBrick.free();
 	gPurpleBrick.free();
 	gOrangeBrick.free();
+	gLifeBrick.free();
 	gLives.free();
 	gAngleLine.free();
 	
@@ -282,8 +288,13 @@ int main(int argc, char* argv[]){
 
 					//render bricks
 					for(lit = bricks.begin();lit!=bricks.end();lit++){
-						(*lit)->render(gRenderer,gBlueBrick, gPurpleBrick, gOrangeBrick);
+						if((*lit)->PWRLife==true){
+							gLifeBrick.render(gRenderer,(*lit)->x,(*lit)->y);
+						}else{
+							(*lit)->render(gRenderer,gBlueBrick, gPurpleBrick, gOrangeBrick);
+						}
 					}
+
 					for(lit = staticBricks.begin();lit!=staticBricks.end();lit++){
 						gStaticBrick.render(gRenderer,(*lit)->x, (*lit)->y);
 					}
@@ -299,6 +310,9 @@ int main(int argc, char* argv[]){
 					if(bricks.empty()){
 						deleteBricks(staticBricks);
 						Ball.Level++;
+						if(Ball.Level>2){
+							Ball.Level = 1;
+						}
 						begin = false;
 
 						createBricks(bricks, staticBricks, Ball, brickW, brickH, 3);

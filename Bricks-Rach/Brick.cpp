@@ -10,32 +10,40 @@ Brick::Brick(int bx, int by, int bw, int bh, int life){
 	hit = false;
 	Life = life;
 	color = 'b';
+
+	PWRLife = false;
 }
 
 //essentialy just changes color to represent health loss
 void Brick::takeHealth(){
 
-	if(color=='b'){
-		color = 'p';
-		hit = false;
-	}else if(color=='p'){
-		color = 'o';
-		hit = false;
-	}else if(color=='o'){
+	Life--;
+	if(Life==0){
 		hit = true;
 	}
+	/*
+	if(Life==3){
+		Life--;
+		hit = false;
+	}else if(Life==2){
+		Life--;
+		hit = false;
+	}else if(Life==1){
+		hit = true;
+	}
+	*/
 }
 
 //renders correct color of brick
 void Brick::render(SDL_Renderer* gRenderer, LTexture& gBlueBrick, LTexture& gPurpleBrick, LTexture& gOrangeBrick){
-	switch(color){
-		case 'b':
+	switch(Life){
+		case 3:
 			gBlueBrick.render(gRenderer,x,y);
 			break;
-		case 'p':
+		case 2:
 			gPurpleBrick.render(gRenderer,x,y);
 			break;
-		case 'o':
+		case 1:
 			gOrangeBrick.render(gRenderer,x,y);
 			break;
 	}

@@ -200,7 +200,7 @@ int main(int argc, char* argv[]){
 	
 
 			Paddle Paddle(gPaddle.getHeight(),gPaddle.getWidth(),0,0);
-			Ball Ball(gBall.getHeight(),gBall.getWidth(), 5, -5);
+			Ball Ball(gBall.getHeight(),gBall.getWidth(), 6, -6);
 
 			createBricks(bricks, staticBricks, Ball, Ball.Level, brickW,brickH);
 

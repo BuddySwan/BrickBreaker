@@ -9,10 +9,6 @@ Ball::Ball(int h, int w, int vel_x, int vel_y){
 	mPosX = SCREEN_WIDTH/2 - w/2;
 	mPosY = SCREEN_HEIGHT - h;
 
-    //Set collision box dimension
-    mCollider.w = OB_WIDTH;
-    mCollider.h = OB_HEIGHT;
-
     //Initialize the velocity
     mVelX = vel_x;
     mVelY = vel_y;
@@ -45,20 +41,20 @@ void Ball::setXY(int x, int y){
 }
 
 //maybe my EF days have finally left me bc its not working
-void Ball::SetAngle(){
+/*void Ball::SetAngle(){
 	int vY = mVelY, vX = mVelX;
 	double tanA = tan((M_PI*Angle)/180);
 
 	//for some reason the tan function is STRUGGLING to calculate tan(90) so I 
 	//did it manually
-/*	if(Angle==90){  
+	if(Angle==90){  
 		mVelX = 0;
 	}else if(Angle==0 || Angle==180){
 		mVelY = 0;
 	}else{
 		mVelY = (vX * tanA);
 		mVelX = (vY / tanA);
-	}*/
+	}
 }
 
 void Ball::ChangeAngle(SDL_Event& e){
@@ -86,7 +82,7 @@ void Ball::ChangeAngle(SDL_Event& e){
 //	SetAngle();
 
 }
-
+*/
 
 //handles reset. ball only starts moving when spacebar is pressed
 bool Ball::begin(SDL_Event& e){
@@ -110,29 +106,24 @@ bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, Pa
 
 	//Move the dot left or right
     mPosX += mVelX;
-    mCollider.x = mPosX;
 
     //up or down
     mPosY += mVelY;
-    mCollider.y = mPosY;
 	
 	//hits wall horizontalaly
 	if((mPosX < 0) || (mPosX + OB_WIDTH > SCREEN_WIDTH)){
 		
 		mPosX -= mVelX;
-		mCollider.x = mPosX;
 		mVelX = -mVelX;
 
 	}else if((mPosY < 70)){   //so it doesnt overlap the lives and score
 
 		mPosY -= mVelY;
-		mCollider.y = mPosY;
 		mVelY = -mVelY;
 
 	}else if(checkPaddleHit(paddle,top,side)){
 		
 		mPosY -= mVelY;
-		mCollider.y = mPosY;
 		mVelY = -mVelY;
 		
 		if(side==true){
@@ -185,12 +176,17 @@ bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, Pa
 					if((*lit)->PWRLife==true){
 						Lives++;
 					}
+					
 
 					(*lit)->takeHealth();
 
+					//extra points if broken
 					if((*lit)->hit==true){
 						Score += 10;
-						bricks.erase(lit++);
+						delete (*lit);
+						lit = bricks.erase(lit);
+					}else{
+						Score += 5;
 					}
 					break;
 				}

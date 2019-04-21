@@ -9,7 +9,6 @@ Brick::Brick(int bx, int by, int bw, int bh, int life){
 	h = bh;
 	hit = false;
 	Life = life;
-	color = 'b';
 
 	PWRLife = false;
 }
@@ -21,17 +20,7 @@ void Brick::takeHealth(){
 	if(Life==0){
 		hit = true;
 	}
-	/*
-	if(Life==3){
-		Life--;
-		hit = false;
-	}else if(Life==2){
-		Life--;
-		hit = false;
-	}else if(Life==1){
-		hit = true;
-	}
-	*/
+	
 }
 
 //renders correct color of brick

@@ -25,11 +25,6 @@ class LWindow
         //Handles window events
         bool handleEvent( SDL_Event& e );
 
-        //Focuses on window
-        void focus();
-
-        //Shows windows contents
-        void render();
 		void renderImage(class LTexture&, int x, int y);
 
         //Deallocates internals
@@ -41,11 +36,6 @@ class LWindow
 
 
         //Window focii
-        bool hasMouseFocus();
-        bool hasKeyboardFocus();
-        bool isMinimized();
-        bool isShown();
-
 		SDL_Renderer* mRenderer;
 
     private:
@@ -58,12 +48,6 @@ class LWindow
         int mWidth;
         int mHeight;
 
-        //Window focus
-        bool mMouseFocus;
-        bool mKeyboardFocus;
-        bool mFullScreen;
-        bool mMinimized;
-        bool mShown;
 };
 
 class LTexture{
@@ -97,10 +81,10 @@ class Brick{
 	int x,y,w,h;
 	int Life;
 	bool hit;
-	char color;
-
+	
 	//power ups
-	bool PWRLife;
+	bool PWRLife; //extra life
+	bool PWRExp; //exploading
 };
 
 class Paddle{
@@ -117,7 +101,6 @@ class Paddle{
 	 void move(); //makes sure it only moves it left or right
 	 void render(LTexture& obj, SDL_Renderer*);
 
-	 int Angle;
 	 int OB_HEIGHT;
 	 int OB_WIDTH;
 
@@ -125,7 +108,6 @@ class Paddle{
 	 int mPosX, mPosY;
 	 int mVelX, mVelY;
 
-	 SDL_Rect mCollider;
 };
 
 class Ball{
@@ -141,8 +123,8 @@ class Ball{
 	//resets X and Y position 
 	void setXY(int x, int y);
 	
-	void SetAngle();  //actively changes the velocity based on angle
-	void ChangeAngle(SDL_Event& e); //handles event to change control with Q and W
+//	void SetAngle();  //actively changes the velocity based on angle
+//	void ChangeAngle(SDL_Event& e); //handles event to change control with Q and W
 
 	bool begin(SDL_Event &e); //controlls spacebar press that makes ball move
 	bool move(std::list<Brick* >& wall, std::list<Brick* >& statics, Paddle paddle);
@@ -164,7 +146,9 @@ class Ball{
 	int mPosX, mPosY;
 	int mVelX, mVelY;
 
-	SDL_Rect mCollider;
+//	bool Bounce;
+//	int Combo;
+
 };
 
 
@@ -174,5 +158,6 @@ void deleteBricks(std::list<Brick* >&);
 bool init();
 bool loadMedia();
 void close();
-bool checkCollision(SDL_Rect a, Brick b);
+bool start(SDL_Event &e);
+
 void Reset(std::list<Brick* >& bricks, std::list<Brick* >& statics, Ball& ball,Paddle& paddle, int w, int h);

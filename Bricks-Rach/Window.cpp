@@ -10,27 +10,17 @@ LWindow::LWindow()
 	//Initialize non-existant window
 	mWindow = NULL;
 	mRenderer = NULL;
-
-	mMouseFocus = false;
-	mKeyboardFocus = false;
-	mFullScreen = false;
-	mShown = false;
-	mWindowID = -1;
 	
-	mWidth = 0;
-	mHeight = 0;
 }
 
 bool LWindow::init()
 {
 	//Create window
-	mWindow = SDL_CreateWindow( "SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 300, 200, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE );
+	mWindow = SDL_CreateWindow( "GAME OVER Brick Breaker 2.0", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 300, 200, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE );
 	if( mWindow != NULL )
 	{
-		mMouseFocus = true;
-		mKeyboardFocus = true;
-		mWidth = SCREEN_WIDTH;
-		mHeight = SCREEN_HEIGHT;
+//		mWidth = SCREEN_WIDTH;
+//		mHeight = SCREEN_HEIGHT;
 
 		//Create renderer for window
 		mRenderer = SDL_CreateRenderer( mWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC );
@@ -48,8 +38,6 @@ bool LWindow::init()
 			//Grab window identifier
 			mWindowID = SDL_GetWindowID( mWindow );
 
-			//Flag as opened
-			mShown = true;
 		}
 	}
 	else
@@ -63,14 +51,14 @@ bool LWindow::init()
 bool LWindow::handleEvent( SDL_Event& e )
 {
 	//If an event was detected for this window
-	if( e.type == SDL_WINDOWEVENT && e.window.windowID == mWindowID )
+	if( e.type == SDL_WINDOWEVENT)
 	{
 		//Caption update flag
 		bool updateCaption = false;
 
 		switch( e.window.event )
 		{
-			//Window appeared
+/*			//Window appeared
 			case SDL_WINDOWEVENT_SHOWN:
 			mShown = true;
 			break;
@@ -130,7 +118,7 @@ bool LWindow::handleEvent( SDL_Event& e )
 			case SDL_WINDOWEVENT_RESTORED:
 			mMinimized = false;
             break;
-
+*/
 			//Hide on close
 			case SDL_WINDOWEVENT_CLOSE:
 			SDL_HideWindow( mWindow );
@@ -138,45 +126,12 @@ bool LWindow::handleEvent( SDL_Event& e )
 			return false;
 			break;
 		}
-
-		//Update window caption with new data
-		if( updateCaption )
-		{
-			std::stringstream caption;
-			caption << "SDL Tutorial - ID: " << mWindowID << " MouseFocus:" << ( ( mMouseFocus ) ? "On" : "Off" ) << " KeyboardFocus:" << ( ( mKeyboardFocus ) ? "On" : "Off" );
-			SDL_SetWindowTitle( mWindow, caption.str().c_str() );
-		}
 	}
 	return true;
 }
 
-void LWindow::focus()
-{
-	//Restore window if needed
-	if( !mShown )
-	{
-		SDL_ShowWindow( mWindow );
-	}
-
-	//Move window forward
-	SDL_RaiseWindow( mWindow );
-}
-
 void LWindow::renderImage(LTexture& image,int x, int y){
 	image.render(mRenderer, x, y);	
-}
-
-void LWindow::render()
-{
-	if( !mMinimized )
-	{	
-		//Clear screen
-//		SDL_SetRenderDrawColor( mRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
-//		SDL_RenderClear( mRenderer );
-
-		//Update screen
-//		SDL_RenderPresent( mRenderer );
-	}
 }
 
 void LWindow::free()
@@ -186,81 +141,6 @@ void LWindow::free()
 		SDL_DestroyWindow( mWindow );
 	}
 
-	mMouseFocus = false;
-	mKeyboardFocus = false;
-	mWidth = 0;
-	mHeight = 0;
 }
 
-int LWindow::getWidth()
-{
-	return mWidth;
-}
 
-int LWindow::getHeight()
-{
-	return mHeight;
-}
-
-bool LWindow::hasMouseFocus()
-{
-	return mMouseFocus;
-}
-
-bool LWindow::hasKeyboardFocus()
-{
-	return mKeyboardFocus;
-}
-
-bool LWindow::isMinimized()
-{
-	return mMinimized;
-}
-
-bool LWindow::isShown()
-{
-	return mShown;
-}
-/*
-bool init()
-{
-	//Initialization flag
-	bool success = true;
-
-	//Initialize SDL
-	if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
-	{
-		printf( "SDL could not initialize! SDL Error: %s\n", SDL_GetError() );
-		success = false;
-	}
-	else
-	{
-		//Set texture filtering to linear
-		if( !SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "1" ) )
-		{
-			printf( "Warning: Linear texture filtering not enabled!" );
-		}
-
-		//Create window
-		if( !gWindows[ 0 ].init() )
-		{
-			printf( "Window 0 could not be created!\n" );
-			success = false;
-		}
-	}
-
-	return success;
-}
-
-void close()
-{
-	//Destroy windows
-	for( int i = 0; i < TOTAL_WINDOWS; ++i )
-	{
-		gWindows[ i ].free();
-	}
-
-	//Quit SDL subsystems
-	SDL_Quit();
-}
-*/

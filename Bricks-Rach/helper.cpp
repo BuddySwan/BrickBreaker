@@ -2,57 +2,14 @@
 #include<fstream>
 
 
-bool checkCollision( SDL_Rect a, Brick b )
-{
-    //The sides of the rectangles
-    int leftA, leftB;
-    int rightA, rightB;
-    int topA, topB;
-    int bottomA, bottomB;
-
-    //Calculate the sides of rect A
-    leftA = a.x;
-    rightA = a.x + a.w;
-    topA = a.y;
-    bottomA = a.y + a.h;
-
-    //Calculate the sides of rect B
-    leftB = b.x;
-    rightB = b.x + b.w;
-    topB = b.y;
-    bottomB = b.y + b.h;
-    //If any of the sides from A are outside of B
-    if( bottomA <= topB )
-    {
-        return false;
-    }
-
-    if( topA >= bottomB )
-    {
-        return false;
-    }
-
-    if( rightA <= leftB )
-    {
-        return false;
-    }
-
-    if( leftA >= rightB )
-    {
-        return false;
-    }
-
-    //If none of the sides from A are outside B
-    return true;
-}
-
-
 //function to turn object into sdl_rect and add to object vector
 void addObject(std::list<Brick* >& objects, int x, int y, int w, int h, int hits, std::string PowerUp){
 	Brick *r = new Brick(x,y,w,h,hits);
 
 	if(PowerUp=="PWRLife"){
 		r->PWRLife = true;
+	}else if(PowerUp=="PWRExp"){
+		r->PWRExp = true;
 	}
 	objects.push_back(r);
 }
@@ -78,6 +35,9 @@ void createBricks(std::list<Brick* >& objects, std::list<Brick* >& staticBricks,
 		case 2:
 			fin.open("Level2.txt");
 			break;
+		case 3:
+			fin.open("Level3.txt");
+			break;
 	}
 	getline(fin,line);
 	buffer.clear();
@@ -92,10 +52,14 @@ void createBricks(std::list<Brick* >& objects, std::list<Brick* >& staticBricks,
 			addObject(staticBricks,x,y,w,h,hits,"");
 		}else if(hits==-2){
 			addObject(objects,x,y,w,h,1,"PWRLife");	
+		}else if(hits==-3){
+			addObject(objects,x,y,w,h,1,"PWRExp");	
 		}else{
 			addObject(objects,x,y,w,h,hits,"");
 		}
 	}
+
+	fin.close();
 /*
 	addObject(objects, 2*w,4*h,w,h,3);
     addObject(objects, 3*w,4*h,w,h,3);
@@ -122,6 +86,7 @@ void createBricks(std::list<Brick* >& objects, std::list<Brick* >& staticBricks,
 void deleteBricks(std::list<Brick* >&objects){
 	std::list<Brick* >::iterator lit;
 	for(lit=objects.begin();lit!=objects.end();lit++){
+		delete (*lit);
 		lit = objects.erase(lit);
 	}
 	
@@ -139,4 +104,18 @@ void Reset(std::list<Brick* >& objects, std::list<Brick* >& statics, Ball& ball,
 	paddle.setXY(SCREEN_WIDTH/2-paddle.OB_WIDTH/2, SCREEN_HEIGHT - paddle.OB_HEIGHT);
 	
 	createBricks(objects, statics, ball, ball.Level,w,h);
+}
+
+bool start(SDL_Event& e){
+	if(e.type == SDL_KEYDOWN && e.key.repeat == 0){
+		if(e.key.keysym.sym == SDLK_RETURN){
+			return false;
+		}
+	}else if(e.type == SDL_KEYUP && e.key.repeat == 0){
+		if(e.key.keysym.sym == SDLK_RETURN){
+			return false;
+		}
+	}
+
+	return true;
 }

@@ -8,10 +8,6 @@ Paddle::Paddle(int h, int w, int vel_x, int vel_y){
 	mPosX = SCREEN_WIDTH/2 - w/2;
 	mPosY = SCREEN_HEIGHT-h;
 
-    //Set collision box dimension
-    mCollider.w = OB_WIDTH;
-    mCollider.h = OB_HEIGHT;
-
     //Initialize the velocity
     mVelX = vel_x;
     mVelY = vel_y;
@@ -71,15 +67,13 @@ void Paddle::handleEvent(SDL_Event& e){
 void Paddle::move(){
     //Move the dot left or right
     mPosX += mVelX;
-    mCollider.x = mPosX;
-
+    
 	//for(int i=0;i<wall.size();i++){
 	    //If the dot collided or went too far to the left or right
 	    if( ( mPosX < 0 ) || ( mPosX + OB_WIDTH > SCREEN_WIDTH ))
 	    {
 			//Move back
 		    mPosX -= mVelX;
-	        mCollider.x = mPosX;
 		}
 	
 }

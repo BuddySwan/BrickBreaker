@@ -8,13 +8,14 @@
 #include<vector>
 #include<list>
 #include<sstream>
+#include<iostream>
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 600;
 
 //this is so multiple windows can pop up
 //i.e tutorial window, end game window
-//idk looks cool
+//idk looks cool lost.png
 class LWindow
 {
     public:
@@ -87,12 +88,13 @@ class Brick{
 	//power ups
 	bool PWRLife; //extra life
 	bool PWRExp; //exploading
+    bool PWRLong; //long paddle
 };
 
 class Paddle{
  public:
 	 static const int OB_VEL = 12;
-	 Paddle(int, int, int, int);
+	 Paddle(int, int, int, int, int, int);
 	 int getX();
 	 int getY();
     int getXVel();
@@ -102,14 +104,18 @@ class Paddle{
 
 	 void handleEvent(SDL_Event& e);
 	 void move(); //makes sure it only moves it left or right
-	 void render(LTexture& obj, SDL_Renderer*);
+	 void render(LTexture&, SDL_Renderer*);
+     void setLong(bool);
 
 	 int OB_HEIGHT;
 	 int OB_WIDTH;
+    bool isLong;
 
  private:
 	 int mPosX, mPosY;
 	 int mVelX, mVelY;
+    int nHeight, nWidth;
+    int lHeight, lWidth;
 
 };
 
@@ -130,7 +136,7 @@ class Ball{
 //	void ChangeAngle(SDL_Event& e); //handles event to change control with Q and W
 
 	bool begin(SDL_Event &e); //controlls spacebar press that makes ball move
-	bool move(std::list<Brick* >& wall, std::list<Brick* >& statics, Paddle paddle);
+	bool move(std::list<Brick* >& wall, std::list<Brick* >& statics, Paddle& paddle);
 	void render(LTexture& obj, SDL_Renderer*);
 
 	bool checkPaddleHit(Paddle, bool&, bool&);
@@ -145,6 +151,8 @@ class Ball{
 	int HighScore;
 	int Level;
 	int MAX_VEL;
+    int longCount;
+    bool longPaddle;
 
  private:
 	double mPosX, mPosY;

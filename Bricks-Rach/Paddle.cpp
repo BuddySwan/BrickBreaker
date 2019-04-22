@@ -1,9 +1,13 @@
 //Paddle class
 #include"head.h"
 
-Paddle::Paddle(int h, int w, int vel_x, int vel_y){
+Paddle::Paddle(int h, int w, int lh, int lw, int vel_x, int vel_y){
 	OB_HEIGHT = h;
 	OB_WIDTH = w;
+    nHeight = h;
+    nWidth = w;
+    lHeight = lh;
+    lWidth = lw;
     //Initialize the offsets
 	mPosX = SCREEN_WIDTH/2 - w/2;
 	mPosY = SCREEN_HEIGHT-h;
@@ -11,6 +15,8 @@ Paddle::Paddle(int h, int w, int vel_x, int vel_y){
     //Initialize the velocity
     mVelX = vel_x;
     mVelY = vel_y;
+    
+    isLong = false;
 }
 
 int Paddle::getX(){
@@ -83,6 +89,25 @@ void Paddle::move(){
 		    mPosX -= mVelX;
 		}
 	
+}
+void Paddle::setLong(bool makeLong){
+    if(makeLong){
+        OB_WIDTH = lWidth;
+        OB_HEIGHT = lHeight;
+        isLong = makeLong;
+        if(mPosX > .5 * (lWidth - nWidth) && mPosX + lWidth < SCREEN_WIDTH - .5 * (lWidth - nWidth)){
+            mPosX -= .5 * (lWidth - nWidth);
+        }else if(mPosX <= .5 * (lWidth - nWidth)){
+            mPosX = 5;
+        }else{
+            mPosX = SCREEN_WIDTH - lWidth;
+        }
+    }else{
+        OB_WIDTH = nWidth;
+        OB_HEIGHT = nHeight;
+        isLong = makeLong;
+        
+    }
 }
 
 //I put the renderer in manually in case we want to do multiple windows for some reason 

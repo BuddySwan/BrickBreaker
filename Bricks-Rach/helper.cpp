@@ -10,7 +10,9 @@ void addObject(std::list<Brick* >& objects, int x, int y, int w, int h, int hits
 		r->PWRLife = true;
 	}else if(PowerUp=="PWRExp"){
 		r->PWRExp = true;
-	}
+    }else if(PowerUp == "PWRLong"){
+        r->PWRLong = true;
+    }
 	objects.push_back(r);
 }
 
@@ -56,7 +58,9 @@ void createBricks(std::list<Brick* >& objects, std::list<Brick* >& staticBricks,
 		}else if(hits==-2){
 			addObject(objects,x,y,w,h,1,"PWRLife");	
 		}else if(hits==-3){
-			addObject(objects,x,y,w,h,1,"PWRExp");	
+			addObject(objects,x,y,w,h,1,"PWRExp");
+        }else if(hits == -4){
+            addObject(objects,x,y,w,h,1,"PWRLong");
 		}else{
 			addObject(objects,x,y,w,h,hits,"");
 		}

@@ -6,12 +6,14 @@ SDL_Renderer* gRenderer = NULL;
 
 LTexture gBackGround;
 LTexture gPaddle;
+LTexture gLongPaddle;
 LTexture gBall;
 LTexture gBlueBrick;
 LTexture gPurpleBrick;
 LTexture gOrangeBrick;
 LTexture gStaticBrick;
 LTexture gLifeBrick;
+LTexture gLongBrick; //to add the long paddle powerup
 LTexture gTextTexture; //this is what says "Score: "
 LTexture gLives;
 LTexture gScoreNum;  //actual moving score 
@@ -73,6 +75,10 @@ bool loadMedia(){
         printf("Failed ot load Me pic\n");
         success = false;
     }
+     if(!gLongPaddle.loadFromFile("PaddleLong.png", gRenderer)){
+     printf("Failed ot load Me pic\n");
+     success = false;
+     }
     if(!gBackGround.loadFromFile("BackGround.png", gRenderer)){
         printf("failed to load background\n");
         success = false;
@@ -110,6 +116,10 @@ bool loadMedia(){
 		printf("failed to load line\n");
 		success = false;
 	}
+    if(!gLongBrick.loadFromFile("greenBrick.png", gRenderer)){
+        printf("failed to load long\n");
+        success = false;
+    }
 	//I added new images so youll have to update those
 /*
  if(!gStartWindow.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Start.png",gRenderer)){
@@ -120,6 +130,10 @@ bool loadMedia(){
  printf("Failed ot load Me pic\n");
  success = false;
  }
+if(!gLongPaddle.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/PaddleLong.png", gRenderer)){
+    printf("Failed ot load Me pic\n");
+    success = false;
+}
  if(!gBackGround.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/BackGround.png", gRenderer)){
  printf("failed to load background\n");
  success = false;
@@ -156,6 +170,10 @@ bool loadMedia(){
  if(!gAngleLine.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Line.png", gRenderer)){
  printf("failed to load line\n");
  success = false;
+ }
+ if(!gLongBrick.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/greenBrick.png", gRenderer)){
+    printf("failed to load long\n");
+    success = false;
  }*/
 
     return success;	
@@ -165,12 +183,14 @@ void close(){
 	
 	gBackGround.free();
 	gPaddle.free();
+    gLongPaddle.free();
 	gBall.free();
 	gBlueBrick.free();
 	gPurpleBrick.free();
 	gOrangeBrick.free();
 	gStaticBrick.free();
 	gLifeBrick.free();
+    gLongBrick.free();
 	gTextTexture.free();
 	gLives.free();
 	gScoreNum.free();
@@ -190,6 +210,8 @@ void close(){
 
 
 int main(int argc, char* argv[]){
+    bool paused = false;
+    bool spacePressed = false;
 	
 	if(!init()){
 		printf("failed to initialize\n");
@@ -222,7 +244,7 @@ int main(int argc, char* argv[]){
 			gTextTexture.loadText(gRenderer,inputText,font, White);
 	
 
-			Paddle Paddle(gPaddle.getHeight(),gPaddle.getWidth(),0,0);
+			Paddle Paddle(gPaddle.getHeight(),gPaddle.getWidth(),gLongPaddle.getHeight(),gLongPaddle.getWidth(),0,0);
 			Ball Ball(gBall.getHeight(),gBall.getWidth(), 5, -5);
 
 			createBricks(bricks, staticBricks, Ball, Ball.Level, brickW,brickH);
@@ -242,6 +264,7 @@ int main(int argc, char* argv[]){
 					gFinalScore.free();
 
 					gLost.loadFromFile("lost.png", gLostWindow.mRenderer);
+                    //gLost.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/lost.png", gLostWindow.mRenderer);
 					gFinalScore.loadText(gLostWindow.mRenderer, scoreNum, finalFont, White);
 
 					//set high score
@@ -285,7 +308,16 @@ int main(int argc, char* argv[]){
 							if(begin==false){
 								begin = Ball.begin(e);
 								//Ball.ChangeAngle(e);
-							}
+							}else if(e.type == SDL_KEYDOWN && e.key.repeat==0){
+                                if(e.key.keysym.sym == SDLK_SPACE && !spacePressed){
+                                    paused = !paused;
+                                    spacePressed = true;
+                                }
+                            }else if(e.type == SDL_KEYUP && e.key.repeat==0){
+                                if(e.key.keysym.sym == SDLK_SPACE){
+                                    spacePressed = false;
+                                }
+                            }
 						}
 					}
 					
@@ -298,7 +330,9 @@ int main(int argc, char* argv[]){
 				else{
 					//if game is lost a new window pops up. it can be turned into a tutorial window or we can keep it 
 					if(GameLost==true){
-				
+                        Paddle.setLong(false);
+                        Ball.longCount = 0;
+                        Ball.longPaddle = false;
 						SDL_SetRenderDrawColor(gLostWindow.mRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
 						SDL_RenderClear(gLostWindow.mRenderer);
 
@@ -308,7 +342,7 @@ int main(int argc, char* argv[]){
 						
 						SDL_RenderPresent(gLostWindow.mRenderer);
 	
-					}else{
+					}else if(!paused){
 						gScoreNum.free();
 						gScoreNum.loadText(gRenderer, scoreNum, font, White);
 
@@ -316,6 +350,9 @@ int main(int argc, char* argv[]){
 
 						if(Lose_Life==true){
 							Ball.setV(5, -5);
+                            Paddle.setLong(false);
+                            Ball.longCount = 0;
+                            Ball.longPaddle = false;
 							begin = false;
 							Lose_Life = false;
 						}
@@ -338,8 +375,12 @@ int main(int argc, char* argv[]){
 					//	if(begin==false){
 					//		gAngleLine.render(gRenderer,Ball.getX()-Ball.OB_WIDTH/2,Ball.getY()-Ball.OB_HEIGHT/2,NULL, Ball.Angle);
 					//	}
-				
-						Paddle.render(gPaddle, gRenderer);
+                        if(Paddle.isLong){
+                            Paddle.render(gLongPaddle,gRenderer);
+                        }else{
+                            Paddle.render(gPaddle,gRenderer);
+                        }
+                        
 						Ball.render(gBall, gRenderer);
 
                         if(bricks.empty()){
@@ -357,7 +398,9 @@ int main(int argc, char* argv[]){
 						for(lit = bricks.begin();lit!=bricks.end();lit++){
 							if((*lit)->PWRLife==true){
 								gLifeBrick.render(gRenderer,(*lit)->x,(*lit)->y);
-							}else{
+                            }else if((*lit)->PWRLong){
+                                gLongBrick.render(gRenderer,(*lit)->x,(*lit)->y);
+                            }else{
 								(*lit)->render(gRenderer,gBlueBrick, gPurpleBrick, gOrangeBrick);
 							}
 						}

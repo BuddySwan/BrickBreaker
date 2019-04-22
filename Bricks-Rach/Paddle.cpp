@@ -25,6 +25,13 @@ void Paddle::setXY(int x, int y){
 	mPosX = x;
 	mPosY = y;
 }
+void Paddle::setVel(int x, int y){
+    mVelX = x;
+    mVelY = y;
+}
+int Paddle::getXVel(){
+    return mVelX;
+}
 
 
 //controlls paddle with arrow keys

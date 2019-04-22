@@ -1,4 +1,5 @@
 #include"head.h"
+#include <iostream>
 
 SDL_Window* gWindow = NULL;
 SDL_Renderer* gRenderer = NULL;
@@ -111,32 +112,52 @@ bool loadMedia(){
 	}
 	//I added new images so youll have to update those
 /*
-   if(!gPaddle.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Paddle.png", gRenderer)){
-        printf("Failed ot load Me pic\n");
-        success = false;
-    }
-    //PUT BACKGROUND HERE
-    if(!gBackGround.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/background.png", gRenderer)){
-        printf("failed to load background\n");
-        success = false;
-    }
-    if(!gBall.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Dot.png", gRenderer)){
-        printf("failed to load ball\n");
-        success = false;
-    }
-    if(!gBlueBrick.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/BlueBrick.png", gRenderer)){
-        printf("failed to load blue\n");
-        success = false;
-    }
-    if(!gPurpleBrick.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/PurpleBrick.png", gRenderer)){
-        printf("failed to load purple\n");
-        success = false;
-    }
-    if(!gOrangeBrick.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/OrangeBrick.png", gRenderer)){
-        printf("failed to load orange\n");
-        success = false;
-    }
-*/
+ if(!gStartWindow.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Start.png",gRenderer)){
+ printf("Failed to load start screen\n");
+ success = false;
+ }
+ if(!gPaddle.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Paddle.png", gRenderer)){
+ printf("Failed ot load Me pic\n");
+ success = false;
+ }
+ if(!gBackGround.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/BackGround.png", gRenderer)){
+ printf("failed to load background\n");
+ success = false;
+ }
+ 
+ if(!gBall.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Dot.png", gRenderer)){
+ printf("failed to load ball\n");
+ success = false;
+ }
+ if(!gBlueBrick.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/BlueBrick.png", gRenderer)){
+ printf("failed to load blue\n");
+ success = false;
+ }
+ if(!gPurpleBrick.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/PurpleBrick.png", gRenderer)){
+ printf("failed to load purple\n");
+ success = false;
+ }
+ if(!gOrangeBrick.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/OrangeBrick.png", gRenderer)){
+ printf("failed to load orange\n");
+ success = false;
+ }
+ if(!gLifeBrick.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/LifeBrick.png", gRenderer)){
+ printf("failed to load life brick\n");
+ success = false;
+ }
+ if(!gStaticBrick.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/StaticBrick.png",gRenderer)){
+ printf("failed to load static\n");
+ success = false;
+ }
+ if(!gLives.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Lives.png", gRenderer)){
+ printf("failed to load hearts\n");
+ success = false;
+ }
+ if(!gAngleLine.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Line.png", gRenderer)){
+ printf("failed to load line\n");
+ success = false;
+ }*/
+
     return success;	
 }
 
@@ -193,14 +214,16 @@ int main(int argc, char* argv[]){
 
 			//for displaying score
 			SDL_Color Black = {0,0,0,0}, White = {255,255,255,255};
-			TTF_Font* font = TTF_OpenFont("Roboto-Black.ttf",24);	
+			TTF_Font* font = TTF_OpenFont("Roboto-Black.ttf",24);
+            //TTF_Font* font = TTF_OpenFont("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Roboto-Black.ttf",24);
 			TTF_Font* finalFont = TTF_OpenFont("Roboto-Black.ttf", 30);
+            //TTF_Font* finalFont = TTF_OpenFont("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Roboto-Black.ttf", 30);
 
 			gTextTexture.loadText(gRenderer,inputText,font, White);
 	
 
 			Paddle Paddle(gPaddle.getHeight(),gPaddle.getWidth(),0,0);
-			Ball Ball(gBall.getHeight(),gBall.getWidth(), 6, -6);
+			Ball Ball(gBall.getHeight(),gBall.getWidth(), 5, -5);
 
 			createBricks(bricks, staticBricks, Ball, Ball.Level, brickW,brickH);
 
@@ -319,7 +342,17 @@ int main(int argc, char* argv[]){
 						Paddle.render(gPaddle, gRenderer);
 						Ball.render(gBall, gRenderer);
 
-
+                        if(bricks.empty()){
+                            deleteBricks(staticBricks);
+                            Ball.Level++;
+                            if(Ball.Level>3){
+                                Ball.Level = 1;
+                            }
+                            begin = false;
+                            
+                            createBricks(bricks, staticBricks, Ball, Ball.Level, brickW, brickH);
+                        }
+                        
 						//render bricks
 						for(lit = bricks.begin();lit!=bricks.end();lit++){
 							if((*lit)->PWRLife==true){
@@ -341,16 +374,6 @@ int main(int argc, char* argv[]){
 						gScoreNum.render(gRenderer, 600, 20);
 
 					
-						if(bricks.empty()){
-							deleteBricks(staticBricks);
-							Ball.Level++;
-							if(Ball.Level>3){
-								Ball.Level = 1;
-							}
-							begin = false;
-
-							createBricks(bricks, staticBricks, Ball, brickW, brickH, 3);
-						}
 					
 
 						SDL_RenderPresent(gRenderer);

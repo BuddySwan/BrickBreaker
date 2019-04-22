@@ -31,12 +31,15 @@ void createBricks(std::list<Brick* >& objects, std::list<Brick* >& staticBricks,
 	switch(Ball.Level){
 		case 1:
 			fin.open("Level1.txt");
+            //fin.open("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Level1.txt");
 			break;
 		case 2:
 			fin.open("Level2.txt");
+            //fin.open("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Level2.txt");
 			break;
 		case 3:
 			fin.open("Level3.txt");
+            //fin.open("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Level3.txt");
 			break;
 	}
 	getline(fin,line);
@@ -102,6 +105,7 @@ void Reset(std::list<Brick* >& objects, std::list<Brick* >& statics, Ball& ball,
 	ball.Level = 1;
 
 	paddle.setXY(SCREEN_WIDTH/2-paddle.OB_WIDTH/2, SCREEN_HEIGHT - paddle.OB_HEIGHT);
+    paddle.setVel(0,0);
 	
 	createBricks(objects, statics, ball, ball.Level,w,h);
 }

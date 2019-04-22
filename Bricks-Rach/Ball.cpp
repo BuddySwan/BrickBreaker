@@ -2,7 +2,7 @@
 #include"head.h"
 #include<cmath>
 
-Ball::Ball(int h, int w, int vel_x, int vel_y){
+Ball::Ball(double h, double w, double vel_x, double vel_y){
 	OB_HEIGHT = h;
 	OB_WIDTH = w;
     //Initialize the offsets
@@ -12,7 +12,7 @@ Ball::Ball(int h, int w, int vel_x, int vel_y){
     //Initialize the velocity
     mVelX = vel_x;
     mVelY = vel_y;
-
+    vel = sqrt(vel_x * vel_x + vel_y * vel_y);
 	Lives = 3;
 	Score = 0;
 	HighScore = 0;
@@ -22,20 +22,21 @@ Ball::Ball(int h, int w, int vel_x, int vel_y){
 	Angle = 45;
 }
 
-int Ball::getX(){
+double Ball::getX(){
 	return mPosX;
 }
 
-int Ball::getY(){
+double Ball::getY(){
 	return mPosY;
 }
 
-void Ball::setV(int x,int y){
+void Ball::setV(double x,double y){
 	mVelX = x;
 	mVelY = y;
+    vel = sqrt(x * x + y * y);
 }
 
-void Ball::setXY(int x, int y){
+void Ball::setXY(double x, double y){
 	mPosX = x;
 	mPosY = y;
 }
@@ -102,7 +103,7 @@ bool Ball::begin(SDL_Event& e){
 //only handles a 90 degree turn at the moment, will make it better
 bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, Paddle paddle){
 	std::list<Brick* >::iterator lit;
-	bool top = false, side = false;
+    bool top = false, lside = false, bottom = false, rside = false;
 
 	//Move the dot left or right
     mPosX += mVelX;
@@ -121,77 +122,76 @@ bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, Pa
 		mPosY -= mVelY;
 		mVelY = -mVelY;
 
-	}else if(checkPaddleHit(paddle,top,side)){
-		
-		mPosY -= mVelY;
-		mVelY = -mVelY;
-		
-		if(side==true){
-			mPosX -= mVelX;
-			mVelX = -mVelX;
-		}
-
+	}else if(checkPaddleHit(paddle,top,lside)){
+        if(top){
+            adjustAngle(paddle);
+        }
+        if(lside){
+            mPosX -= mVelX;
+            mVelX = -mVelX;
+        }
 	}else if(mPosY + OB_HEIGHT > SCREEN_HEIGHT){
 		Lives--;
 		return true;
 
     }else{
 		//check if hit with static brick
-		 for(lit = staticBricks.begin();lit != staticBricks.end(); lit++){
-			if(checkCollide(*(*lit),top,side)){
-				mPosX -= mVelX;	
+        for(lit = bricks.begin();lit != bricks.end(); lit++){
+            
+            if(checkCollide(*(*lit),top,rside,lside,bottom)){
+                
+                if((*lit)->hit==false){
+                    mPosX -=mVelX;
+                    mPosY -= mVelY;
+                    
+                    int m = 0;
+                    
+                    if(mVelY < 0 && mVelY > -(MAX_VEL)){
+                        m = -1;
+                    }else if(mVelY > 0 && mVelY < MAX_VEL){
+                        m = 1;
+                    }
+                    
+                    if(top==true || bottom == true){
+                        mVelY = -(mVelY);
+                    }else if(lside == true || rside == true){
+                        mVelX = -(mVelX);
+                    }
+                    
+                    //check if brick is a power up
+                    if((*lit)->PWRLife==true){
+                        Lives++;
+                    }
+                    
+                    
+                    (*lit)->takeHealth();
+                    
+                    //extra points if broken
+                    if((*lit)->hit==true){
+                        Score += 10;
+                        delete (*lit);
+                        lit = bricks.erase(lit);
+                    }else{
+                        Score += 5;
+                    }
+                    break;
+                }
+            }
+        }
+        for(lit = staticBricks.begin();lit != staticBricks.end(); lit++){
+			if(checkCollide(*(*lit),top,rside,lside,bottom)){
+				mPosX -= mVelX;
 				mPosY -= mVelY;
-				if(top==true){
+				if(top==true || bottom == true){
 					mVelY = -(mVelY);
-				}else{
+                }else if(lside == true || rside == true){
 					mVelX = -(mVelX);
 				}
 			
 				return false;
 			}
-		 }
-		 for(lit = bricks.begin();lit != bricks.end(); lit++){
-
-		    if(checkCollide(*(*lit),top,side)){
-		
-				if((*lit)->hit==false){ 
-					mPosX -=mVelX;
-					mPosY -= mVelY;
-
-					int m = 0;
-
-					if(mVelY < 0 && mVelY > -(MAX_VEL)){
-						m = -1;
-					}else if(mVelY > 0 && mVelY < MAX_VEL){
-						m = 1;
-					}
-
-					if(top==true){
-						mVelY = -(mVelY + m);
-					}else{
-						mVelX = -(mVelX + m);
-					}
-
-					//check if brick is a power up
-					if((*lit)->PWRLife==true){
-						Lives++;
-					}
-					
-
-					(*lit)->takeHealth();
-
-					//extra points if broken
-					if((*lit)->hit==true){
-						Score += 10;
-						delete (*lit);
-						lit = bricks.erase(lit);
-					}else{
-						Score += 5;
-					}
-					break;
-				}
-			}
-		}
+        }
+		 
 	}		
 
     
@@ -200,7 +200,7 @@ bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, Pa
 
 }
 
-bool Ball::checkCollide(Brick brick, bool &top, bool &side){
+bool Ball::checkCollide(Brick brick, bool &top, bool &rside, bool &lside, bool &bottom){
     int leftA, leftB;
     int rightA, rightB;
     int topA, topB;
@@ -230,10 +230,16 @@ bool Ball::checkCollide(Brick brick, bool &top, bool &side){
     if( leftA >= rightB ){
 		return false;
     }
- 
-	if(((mPosX >= brick.x + brick.w -10 && mPosX <= brick.x + brick.w + 10) || (mPosX + OB_WIDTH <= brick.x + 10 && mPosX + OB_WIDTH >= brick.x - 10))){
-		side = true;
-	}else if(((mPosY >= brick.y + brick.h -10 && mPosY <= brick.y + brick.h + 10) || (mPosY + OB_HEIGHT <= brick.y + 10 && mPosY + OB_HEIGHT >= brick.y - 10))){
+    if(mPosX >= brick.x + brick.w -10 && mPosX <= brick.x + brick.w + 10 && mVelX < 0){
+        rside = true;
+    }
+    if(mPosX + OB_WIDTH <= brick.x + 10 && mPosX + OB_WIDTH >= brick.x - 10 && mVelX > 0){
+		lside = true;
+    }
+    if(mPosY >= brick.y + brick.h -10 && mPosY <= brick.y + brick.h + 10 && mVelY < 0){
+        bottom = true;
+    }
+    if(mPosY + OB_HEIGHT <= brick.y + 10 && mPosY + OB_HEIGHT >= brick.y - 10 && mVelY > 0){
 		top = true;
 	}
     //If none of the sides from A are outside B
@@ -288,6 +294,21 @@ else if(((mPosY >= pad.OB_HEIGHT + pad.OB_HEIGHT -10 && mPosY <= pad.getY() + pa
 }
     //If none of the sides from A are outside B
     return true;	
+}
+void Ball::adjustAngle(Paddle pad){
+    mPosY -= mVelY;
+    double ballMid = mPosX + (OB_WIDTH / 2);
+    double paddleMid = pad.getX() + (pad.OB_WIDTH / 2);
+    double angle = 45 - (20 * ((paddleMid - ballMid)/pad.OB_WIDTH)); //max 55 min 35
+    int xDir = mVelX / fabs(mVelX);
+    if(pad.getXVel() / mVelX > 0){
+        angle -= 10;
+    }else{
+        angle += 10;
+    }
+    angle = angle * M_PI / 180;
+    mVelX = xDir * cos(angle) * vel;
+    mVelY = -1 * sin(angle) * vel;
 }
 
 void Ball::render(LTexture& gBall, SDL_Renderer* gRenderer){

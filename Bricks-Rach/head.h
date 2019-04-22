@@ -1,6 +1,8 @@
 #include<SDL2/SDL.h>
 #include<SDL2/SDL_image.h>
+//#include<SDL2_image/SDL_image.h>
 #include<SDL2/SDL_ttf.h>
+//#include<SDL2_ttf/SDL_ttf.h>
 #include<cstdio>
 #include<string>
 #include<vector>
@@ -93,9 +95,10 @@ class Paddle{
 	 Paddle(int, int, int, int);
 	 int getX();
 	 int getY();
-
+    int getXVel();
 	 //resets coordinates
 	 void setXY(int x, int y);
+    void setVel(int x, int y);
 
 	 void handleEvent(SDL_Event& e);
 	 void move(); //makes sure it only moves it left or right
@@ -114,14 +117,14 @@ class Ball{
  public:
 	//arbitary num I just set; same for Paddle
 	static const int OB_VEL = 12;
-	Ball(int, int, int, int);
+	Ball(double, double, double, double);
 
 	//get x and y positions
-	int getX();
-	int getY();
-	void setV(int, int); //set velocity
+	double getX();
+	double getY();
+	void setV(double, double); //set velocity
 	//resets X and Y position 
-	void setXY(int x, int y);
+	void setXY(double x, double y);
 	
 //	void SetAngle();  //actively changes the velocity based on angle
 //	void ChangeAngle(SDL_Event& e); //handles event to change control with Q and W
@@ -131,7 +134,8 @@ class Ball{
 	void render(LTexture& obj, SDL_Renderer*);
 
 	bool checkPaddleHit(Paddle, bool&, bool&);
-	bool checkCollide(Brick brick, bool&, bool&);
+	bool checkCollide(Brick brick, bool&, bool&, bool&, bool&);
+    void adjustAngle(Paddle pad);
 
 	int Angle; 
 	int OB_HEIGHT;
@@ -143,8 +147,9 @@ class Ball{
 	int MAX_VEL;
 
  private:
-	int mPosX, mPosY;
-	int mVelX, mVelY;
+	double mPosX, mPosY;
+	double mVelX, mVelY;
+    double vel;
 
 //	bool Bounce;
 //	int Combo;

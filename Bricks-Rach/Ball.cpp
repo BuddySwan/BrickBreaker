@@ -20,6 +20,7 @@ Ball::Ball(double h, double w, double vel_x, double vel_y){
 	MAX_VEL = 6;
 
 	Angle = 45;
+    longPaddle = false;
 }
 
 double Ball::getX(){
@@ -101,7 +102,7 @@ bool Ball::begin(SDL_Event& e){
 
 //moves ball and checks for collision. sign changes account for hitting wall or brick, and kept track of in program.
 //only handles a 90 degree turn at the moment, will make it better
-bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, Paddle paddle){
+bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, Paddle& paddle){
 	std::list<Brick* >::iterator lit;
     bool top = false, lside = false, bottom = false, rside = false;
 
@@ -162,6 +163,19 @@ bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, Pa
                     if((*lit)->PWRLife==true){
                         Lives++;
                     }
+                    if((*lit)->PWRLong){
+                        paddle.setLong(true);
+                        longCount = 0;
+                        longPaddle = true;
+                    }else if(longPaddle){
+                        longCount++;
+                        if(longCount >= 10){
+                            paddle.setLong(false);
+                            longPaddle = false;
+                            longCount = 0;
+                        }
+                    }
+                    
                     
                     
                     (*lit)->takeHealth();
@@ -299,7 +313,7 @@ void Ball::adjustAngle(Paddle pad){
     mPosY -= mVelY;
     double ballMid = mPosX + (OB_WIDTH / 2);
     double paddleMid = pad.getX() + (pad.OB_WIDTH / 2);
-    double angle = 45 - (20 * ((paddleMid - ballMid)/pad.OB_WIDTH)); //max 55 min 35
+    double angle = 55 - (40 * (fabs(paddleMid - ballMid)/pad.OB_WIDTH)); //max 55 min 35
     int xDir = mVelX / fabs(mVelX);
     if(pad.getXVel() / mVelX > 0){
         angle -= 10;

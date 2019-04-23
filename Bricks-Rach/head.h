@@ -137,7 +137,7 @@ class Ball{
 //	void ChangeAngle(SDL_Event& e); //handles event to change control with Q and W
 
 	bool begin(SDL_Event &e); //controlls spacebar press that makes ball move
-	bool move(std::list<Brick* >& wall, std::list<Brick* >& statics, Paddle& paddle);
+    bool move(std::list<Brick* >& wall, std::list<Brick* >& statics, std::list<Brick* >& powerUps, Paddle& paddle);
 	void render(LTexture& obj, SDL_Renderer*);
 
 	bool checkPaddleHit(Paddle, bool&, bool&);
@@ -155,7 +155,7 @@ class Ball{
     int longCount;
     bool longPaddle;
 	bool faster;
-	bool fastCount;
+	int fastCount;
 
 
  private:
@@ -170,11 +170,11 @@ class Ball{
 
 
 void addObject(std::list<Brick* >&, int, int, int, int, std::string);
-void createBricks(std::list<Brick* >&, std::list<Brick* >&, Ball&, int, int, int);
+void createBricks(std::list<Brick* >&, std::list<Brick* >&, std::list<Brick* >&, Ball&, int, int, int);
 void deleteBricks(std::list<Brick* >&);
 bool init();
 bool loadMedia();
 void close();
 bool start(SDL_Event &e);
 
-void Reset(std::list<Brick* >& bricks, std::list<Brick* >& statics, Ball& ball,Paddle& paddle, int w, int h);
+void Reset(std::list<Brick* >& bricks, std::list<Brick* >& statics, std::list<Brick* >& powerUps, Ball& ball,Paddle& paddle, int w, int h);

@@ -23,7 +23,7 @@ void addObject(std::list<Brick* >& objects, int x, int y, int w, int h, int hits
 //MAX_VEL (of ball)
 //x y hits (for all bricks in level)
 //might update it so that if hits=-1 its an unbreakble one
-void createBricks(std::list<Brick* >& objects, std::list<Brick* >& staticBricks, Ball& Ball, int Level, int w, int h){
+void createBricks(std::list<Brick* >& objects, std::list<Brick* >& staticBricks, std::list<Brick* >& powerUps, Ball& Ball, int Level, int w, int h){
     w += 3;
     h += 3;
 	int x, y, hits;
@@ -32,7 +32,7 @@ void createBricks(std::list<Brick* >& objects, std::list<Brick* >& staticBricks,
 	std::string line;
 	std::istringstream buffer;
 
-	switch(Ball.Level){
+	switch(Level){
 		case 1:
 			fin.open("Level1.txt");
             //fin.open("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Level1.txt");
@@ -45,6 +45,14 @@ void createBricks(std::list<Brick* >& objects, std::list<Brick* >& staticBricks,
 			fin.open("Level3.txt");
             //fin.open("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Level3.txt");
 			break;
+        case 4:
+            fin.open("Level4.txt");
+            //fin.open("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Level4.txt");
+            break;
+        case 5:
+            fin.open("Level5.txt");
+            //fin.open("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Level5.txt");
+            break;
 	}
 	getline(fin,line);
 	buffer.clear();
@@ -58,13 +66,13 @@ void createBricks(std::list<Brick* >& objects, std::list<Brick* >& staticBricks,
 		if(hits==-1){
 			addObject(staticBricks,x,y,w,h,hits,"");
 		}else if(hits==-2){
-			addObject(objects,x,y,w,h,1,"PWRLife");	
+			addObject(powerUps,x,y,w,h,1,"PWRLife");
 		}else if(hits==-3){
-			addObject(objects,x,y,w,h,1,"PWRExp");
+			addObject(powerUps,x,y,w,h,1,"PWRExp");
         }else if(hits == -4){
-            addObject(objects,x,y,w,h,1,"PWRLong");
+            addObject(powerUps,x,y,w,h,1,"PWRLong");
 		}else if(hits==-5){
-			addObject(objects,x,y,w,h,1,"PWRFast");
+			addObject(powerUps,x,y,w,h,1,"PWRFast");
 		}else{
 			addObject(objects,x,y,w,h,hits,"");
 		}
@@ -80,12 +88,13 @@ void deleteBricks(std::list<Brick* >&objects){
 		delete (*lit);
 		lit = objects.erase(lit);
 	}
-	
+    objects.clear();
 }
 
-void Reset(std::list<Brick* >& objects, std::list<Brick* >& statics, Ball& ball,Paddle& paddle, int w, int h){
+void Reset(std::list<Brick* >& objects, std::list<Brick* >& statics, std::list<Brick* >& powerUps, Ball& ball,Paddle& paddle, int w, int h){
 	deleteBricks(objects);
 	deleteBricks(statics);
+    deleteBricks(powerUps);
 
 	ball.Lives = 3;
 	ball.Score = 0;
@@ -95,7 +104,7 @@ void Reset(std::list<Brick* >& objects, std::list<Brick* >& statics, Ball& ball,
 	paddle.setXY(SCREEN_WIDTH/2-paddle.OB_WIDTH/2, SCREEN_HEIGHT - paddle.OB_HEIGHT);
     paddle.setVel(0,0);
 	
-	createBricks(objects, statics, ball, ball.Level,w,h);
+	createBricks(objects, statics, powerUps, ball, ball.Level,w,h);
 }
 
 bool start(SDL_Event& e){

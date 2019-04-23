@@ -181,7 +181,7 @@ if(!gLongPaddle.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBrea
     printf("failed to load long\n");
     success = false;
  }
- if(!gFastBrick.loadFromFIle("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/greenBrick.png",gRenderer)){
+ if(!gFastBrick.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/fastBrick.png",gRenderer)){
 	printf("failed to load fast brick\n");
 	success = false;
  }*/
@@ -239,7 +239,7 @@ int main(int argc, char* argv[]){
 
 			std::stringstream buffer;
 	
-			std::list<Brick* > bricks, staticBricks;
+            std::list<Brick* > bricks, staticBricks, powerUps;
 			std::list<Brick* >::iterator lit;
 
 			//Lost window, will put image in later
@@ -258,7 +258,7 @@ int main(int argc, char* argv[]){
 			Paddle Paddle(gPaddle.getHeight(),gPaddle.getWidth(),gLongPaddle.getHeight(),gLongPaddle.getWidth(),0,0);
 			Ball Ball(gBall.getHeight(),gBall.getWidth(), 6, -6);
 
-			createBricks(bricks, staticBricks, Ball, Ball.Level, brickW,brickH);
+			createBricks(bricks, staticBricks, powerUps, Ball, Ball.Level, brickW,brickH);
 
 			while(!quit){
 				
@@ -300,7 +300,7 @@ int main(int argc, char* argv[]){
 						GameLost = gLostWindow.handleEvent(e);
 						//reset game
 						if(GameLost==false){
-							Reset(bricks,staticBricks,Ball,Paddle,brickW,brickH);
+							Reset(bricks,staticBricks,powerUps,Ball,Paddle,brickW,brickH);
 							gLost.free();
 							gFinalScore.free();
 							gHighScore.free();
@@ -370,7 +370,7 @@ int main(int argc, char* argv[]){
 	
 						//move ball when spacebar is pressed, otherwise follow paddle
 						if(begin==true){
-							Lose_Life = Ball.move(bricks, staticBricks, Paddle);
+							Lose_Life = Ball.move(bricks, staticBricks, powerUps, Paddle);
 						}else{
 							Ball.setXY(Paddle.getX()+35, Paddle.getY()-30);
 						}
@@ -396,27 +396,29 @@ int main(int argc, char* argv[]){
 
                         if(bricks.empty()){
                             deleteBricks(staticBricks);
+                            deleteBricks(powerUps);
                             Ball.Level++;
-                            if(Ball.Level>3){
+                            if(Ball.Level>5){
                                 Ball.Level = 1;
                             }
                             begin = false;
                             
-                            createBricks(bricks, staticBricks, Ball, Ball.Level, brickW, brickH);
+                            createBricks(bricks, staticBricks, powerUps, Ball, Ball.Level, brickW, brickH);
                         }
                         
 						//render bricks
 						for(lit = bricks.begin();lit!=bricks.end();lit++){
-							if((*lit)->PWRLife){
-								gLifeBrick.render(gRenderer,(*lit)->x,(*lit)->y);
+                            (*lit)->render(gRenderer,gBlueBrick, gPurpleBrick, gOrangeBrick);
+						}
+                        for(lit = powerUps.begin(); lit != powerUps.end(); lit++){
+                            if((*lit)->PWRLife){
+                                gLifeBrick.render(gRenderer,(*lit)->x,(*lit)->y);
                             }else if((*lit)->PWRLong){
                                 gLongBrick.render(gRenderer,(*lit)->x,(*lit)->y);
                             }else if((*lit)->PWRFast){
-								gFastBrick.render(gRenderer,(*lit)->x,(*lit)->y);
-							}else{
-								(*lit)->render(gRenderer,gBlueBrick, gPurpleBrick, gOrangeBrick);
-							}
-						}
+                                gFastBrick.render(gRenderer,(*lit)->x,(*lit)->y);
+                            }
+                        }
 
 						for(lit = staticBricks.begin();lit!=staticBricks.end();lit++){
 							gStaticBrick.render(gRenderer,(*lit)->x, (*lit)->y);
@@ -442,6 +444,7 @@ int main(int argc, char* argv[]){
 
 			deleteBricks(bricks);
 			deleteBricks(staticBricks);
+            deleteBricks(powerUps);
 		}
 	}
 

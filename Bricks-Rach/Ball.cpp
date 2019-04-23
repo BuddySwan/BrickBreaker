@@ -104,7 +104,7 @@ bool Ball::begin(SDL_Event& e){
 
 //moves ball and checks for collision. sign changes account for hitting wall or brick, and kept track of in program.
 //only handles a 90 degree turn at the moment, will make it better
-bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, Paddle& paddle){
+bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, std::list<Brick* >& powerUps, Paddle& paddle){
 	std::list<Brick* >::iterator lit;
     bool top = false, lside = false, bottom = false, rside = false;
 
@@ -129,16 +129,87 @@ bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, Pa
         if(top){
             adjustAngle(paddle);
         }
-        if(lside){
-            mPosX -= mVelX;
-            mVelX = -mVelX;
-        }
 	}else if(mPosY + OB_HEIGHT > SCREEN_HEIGHT){
 		Lives--;
 		return true;
 
     }else{
 		//check if hit with static brick
+        for(lit = powerUps.begin(); lit != powerUps.end(); lit++){
+            if(checkCollide(*(*lit),top,rside,lside,bottom)){
+                
+                if((*lit)->hit==false){
+                    mPosX -=mVelX;
+                    mPosY -= mVelY;
+                    
+                    int m = 0;
+                    
+                    if(mVelY < 0 && mVelY > -(MAX_VEL)){
+                        m = -1;
+                    }else if(mVelY > 0 && mVelY < MAX_VEL){
+                        m = 1;
+                    }
+                    
+                    if(top==true || bottom == true){
+                        mVelY = -(mVelY);
+                    }else if(lside == true || rside == true){
+                        mVelX = -(mVelX);
+                    }
+                    if((*lit)->PWRLife==true){
+                        Lives++;
+                    }
+                    
+                    if((*lit)->PWRFast==true){
+                        if(mVelX < 0){
+                            mVelX -= 1.3;
+                        }else if(mVelX > 0){
+                            mVelX += 1.3;
+                        }
+                        if(mVelY < 0){
+                            mVelY -= 1.3;
+                        }else if(mVelY > 0){
+                            mVelY += 1.3;
+                        }
+                        vel += 2;
+                        fastCount = 0;
+                        
+                        faster = true;
+                        
+                    }else if(faster){
+                        fastCount++;
+                        if(fastCount > 6){
+                            vel -= 2;
+                            faster = false;
+                            fastCount = 0;
+                        }
+                    }
+                    
+                    if((*lit)->PWRLong){
+                        paddle.setLong(true);
+                        longCount = 0;
+                        longPaddle = true;
+                    }else if(longPaddle){
+                        longCount++;
+                        if(longCount >= 10){
+                            paddle.setLong(false);
+                            longPaddle = false;
+                            longCount = 0;
+                        }
+                    }
+                    (*lit)->takeHealth();
+                    
+                    //extra points if broken
+                    if((*lit)->hit==true){
+                        Score += 20;
+                        delete (*lit);
+                        lit = powerUps.erase(lit);
+                    }else{
+                        Score += 5;
+                    }
+                    break;
+                }
+            }
+        }
         for(lit = bricks.begin();lit != bricks.end(); lit++){
             
             if(checkCollide(*(*lit),top,rside,lside,bottom)){
@@ -161,42 +232,8 @@ bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, Pa
                         mVelX = -(mVelX);
                     }
                     
-                    //check if brick is a power up
-                    if((*lit)->PWRLife==true){
-                        Lives++;
-                    }
-					
-					if((*lit)->PWRFast==true){
-						if(mVelX < 0){
-							mVelX -= 4;
-						}else if(mVelX > 0){
-							mVelX += 4;
-						}
-						if(mVelY < 0){
-							mVelY -= 4;
-						}else if(mVelY > 0){
-							mVelY += 4;
-						}
-						
-						fastCount = 0;
-
-						faster = true;
-
-					}else if(faster){
-						fastCount++;
-						if(fastCount > 6){
-							mVelX -= 4;
-							mVelY-= 4;
-							faster = false;
-							fastCount = 0;
-						}
-					}
-
-                    if((*lit)->PWRLong){
-                        paddle.setLong(true);
-                        longCount = 0;
-                        longPaddle = true;
-                    }else if(longPaddle){
+                    (*lit)->takeHealth();
+                    if(longPaddle){
                         longCount++;
                         if(longCount >= 10){
                             paddle.setLong(false);
@@ -204,11 +241,14 @@ bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, Pa
                             longCount = 0;
                         }
                     }
-			
-                    
-                    
-                    
-                    (*lit)->takeHealth();
+                    if(faster){
+                        fastCount++;
+                        if(fastCount > 6){
+                            vel -= 2;
+                            faster = false;
+                            fastCount = 0;
+                        }
+                    }
                     
                     //extra points if broken
                     if((*lit)->hit==true){
@@ -231,7 +271,14 @@ bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, Pa
                 }else if(lside == true || rside == true){
 					mVelX = -(mVelX);
 				}
-			
+                if(longPaddle){
+                    longCount++;
+                    if(longCount >= 10){
+                        paddle.setLong(false);
+                        longPaddle = false;
+                        longCount = 0;
+                    }
+                }
 				return false;
 			}
         }
@@ -333,7 +380,7 @@ bool Ball::checkPaddleHit(Paddle pad, bool& top, bool& side){
 if(((mPosX >= pad.getX() + pad.OB_WIDTH -10 && mPosX <= pad.getX() + pad.OB_WIDTH + 10) || (mPosX + OB_WIDTH <= pad.getX() + 10 && mPosX + OB_WIDTH >= pad.getX() - 10))){
         side = true;
     }
-else if(((mPosY >= pad.OB_HEIGHT + pad.OB_HEIGHT -10 && mPosY <= pad.getY() + pad.OB_HEIGHT + 10) || (mPosY + OB_HEIGHT <= pad.getY() + 10 && mPosY + OB_HEIGHT >= pad.getY() - 10))){
+ else if(((mPosY + OB_HEIGHT <= pad.getY() + 15 && mPosY + OB_HEIGHT >= pad.getY() - 15))){
 	top = true;
 }
     //If none of the sides from A are outside B

@@ -89,6 +89,7 @@ class Brick{
 	bool PWRLife; //extra life
 	bool PWRExp; //exploading
     bool PWRLong; //long paddle
+	bool PWRFast;
 };
 
 class Paddle{
@@ -153,6 +154,9 @@ class Ball{
 	int MAX_VEL;
     int longCount;
     bool longPaddle;
+	bool faster;
+	bool fastCount;
+
 
  private:
 	double mPosX, mPosY;

@@ -21,6 +21,8 @@ Ball::Ball(double h, double w, double vel_x, double vel_y){
 
 	Angle = 45;
     longPaddle = false;
+	faster = false;
+
 }
 
 double Ball::getX(){
@@ -163,6 +165,33 @@ bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, Pa
                     if((*lit)->PWRLife==true){
                         Lives++;
                     }
+					
+					if((*lit)->PWRFast==true){
+						if(mVelX < 0){
+							mVelX -= 4;
+						}else if(mVelX > 0){
+							mVelX += 4;
+						}
+						if(mVelY < 0){
+							mVelY -= 4;
+						}else if(mVelY > 0){
+							mVelY += 4;
+						}
+						
+						fastCount = 0;
+
+						faster = true;
+
+					}else if(faster){
+						fastCount++;
+						if(fastCount > 6){
+							mVelX -= 4;
+							mVelY-= 4;
+							faster = false;
+							fastCount = 0;
+						}
+					}
+
                     if((*lit)->PWRLong){
                         paddle.setLong(true);
                         longCount = 0;
@@ -175,6 +204,7 @@ bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, Pa
                             longCount = 0;
                         }
                     }
+			
                     
                     
                     

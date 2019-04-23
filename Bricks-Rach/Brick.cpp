@@ -12,6 +12,7 @@ Brick::Brick(int bx, int by, int bw, int bh, int life){
 
 	PWRLife = false;
     PWRLong = false;
+	PWRFast = false;
 }
 
 //essentialy just changes color to represent health loss

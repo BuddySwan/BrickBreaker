@@ -12,7 +12,9 @@ void addObject(std::list<Brick* >& objects, int x, int y, int w, int h, int hits
 		r->PWRExp = true;
     }else if(PowerUp == "PWRLong"){
         r->PWRLong = true;
-    }
+    }else if(PowerUp == "PWRFast"){
+		r->PWRFast = true;
+	}
 	objects.push_back(r);
 }
 
@@ -61,32 +63,14 @@ void createBricks(std::list<Brick* >& objects, std::list<Brick* >& staticBricks,
 			addObject(objects,x,y,w,h,1,"PWRExp");
         }else if(hits == -4){
             addObject(objects,x,y,w,h,1,"PWRLong");
+		}else if(hits==-5){
+			addObject(objects,x,y,w,h,1,"PWRFast");
 		}else{
 			addObject(objects,x,y,w,h,hits,"");
 		}
 	}
 
 	fin.close();
-/*
-	addObject(objects, 2*w,4*h,w,h,3);
-    addObject(objects, 3*w,4*h,w,h,3);
-    addObject(objects, 4*w,4*h,w,h,3);
-    addObject(objects, 5*w,4*h,w,h,3);
-    addObject(objects, 6*w,4*h,w,h,3);
-    addObject(objects, 1.5*w,5*h,w,h,3);
-    addObject(objects, 2.5*w,5*h,w,h,3);
-    addObject(objects, 3.5*w,5*h,w,h,3);
-    addObject(objects, 4.5*w,5*h,w,h,3);
-    addObject(objects, 5.5*w,5*h,w,h,3);
-    addObject(objects, 6.5*w,5*h,w,h,3);
-    addObject(objects, 2*w,6*h,w,h,3);
-    addObject(objects, 3*w,6*h,w,h,3);
-    addObject(objects, 4*w,6*h,w,h,3);
-    addObject(objects, 5*w,6*h,w,h,3);
-    addObject(objects, 6*w,6*h,w,h,3);
-*/    
-
-
     
 }
 

@@ -14,11 +14,13 @@ LTexture gOrangeBrick;
 LTexture gStaticBrick;
 LTexture gLifeBrick;
 LTexture gLongBrick; //to add the long paddle powerup
+LTexture gFastBrick;
 LTexture gTextTexture; //this is what says "Score: "
 LTexture gLives;
 LTexture gScoreNum;  //actual moving score 
 LTexture gLost;
 LTexture gStartWindow;
+
 
 LTexture gFinalScore;
 LTexture gAngleLine;
@@ -120,6 +122,10 @@ bool loadMedia(){
         printf("failed to load long\n");
         success = false;
     }
+	if(!gFastBrick.loadFromFile("fastBrick.png", gRenderer)){
+		printf("failed to load fast brick\n");
+		success = false;
+	}
 	//I added new images so youll have to update those
 /*
  if(!gStartWindow.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Start.png",gRenderer)){
@@ -174,6 +180,10 @@ if(!gLongPaddle.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBrea
  if(!gLongBrick.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/greenBrick.png", gRenderer)){
     printf("failed to load long\n");
     success = false;
+ }
+ if(!gFastBrick.loadFromFIle("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/greenBrick.png",gRenderer)){
+	printf("failed to load fast brick\n");
+	success = false;
  }*/
 
     return success;	
@@ -191,6 +201,7 @@ void close(){
 	gStaticBrick.free();
 	gLifeBrick.free();
     gLongBrick.free();
+	gFastBrick.free();
 	gTextTexture.free();
 	gLives.free();
 	gScoreNum.free();
@@ -245,7 +256,7 @@ int main(int argc, char* argv[]){
 	
 
 			Paddle Paddle(gPaddle.getHeight(),gPaddle.getWidth(),gLongPaddle.getHeight(),gLongPaddle.getWidth(),0,0);
-			Ball Ball(gBall.getHeight(),gBall.getWidth(), 5, -5);
+			Ball Ball(gBall.getHeight(),gBall.getWidth(), 6, -6);
 
 			createBricks(bricks, staticBricks, Ball, Ball.Level, brickW,brickH);
 
@@ -349,7 +360,7 @@ int main(int argc, char* argv[]){
 						Paddle.move();
 
 						if(Lose_Life==true){
-							Ball.setV(5, -5);
+							Ball.setV(6, -6);
                             Paddle.setLong(false);
                             Ball.longCount = 0;
                             Ball.longPaddle = false;
@@ -396,11 +407,13 @@ int main(int argc, char* argv[]){
                         
 						//render bricks
 						for(lit = bricks.begin();lit!=bricks.end();lit++){
-							if((*lit)->PWRLife==true){
+							if((*lit)->PWRLife){
 								gLifeBrick.render(gRenderer,(*lit)->x,(*lit)->y);
                             }else if((*lit)->PWRLong){
                                 gLongBrick.render(gRenderer,(*lit)->x,(*lit)->y);
-                            }else{
+                            }else if((*lit)->PWRFast){
+								gFastBrick.render(gRenderer,(*lit)->x,(*lit)->y);
+							}else{
 								(*lit)->render(gRenderer,gBlueBrick, gPurpleBrick, gOrangeBrick);
 							}
 						}

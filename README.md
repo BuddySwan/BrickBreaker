@@ -57,6 +57,7 @@ Code documentation/version control:
 	-LONG BRICK (Green) = Makes Paddle longer for 10 hits
  
 · HOW TO BUILD:
+	-THE ACTUAL GAME IS IN Bricks-Rach FILE!!
 	-A handy Makefile is included in the files that can be used on the terminal to compile.
 		--Executable Below--
 		./Brick_Breaker 

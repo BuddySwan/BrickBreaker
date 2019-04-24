@@ -37,8 +37,19 @@ Work and collaboration
 		were cleared. (4.5 hours)
 	APRIL 21 - Changed how score was calculated and velocity so it was smoother. (30 minutes)
 	APRIL 22 - Added flash brick that makes ball speed increase. (45 minutes)
+	
+Timelog BUDDY	 
+March 7: Downloaded and installed SDL and began working on the tutorials (Setting up a project and closing the window) -2hrs
+March 25: Worked through the images tutorial and learned how to add images -2hrs
+March 28: Worked on dealing with keyboard input rendering shapes to the window -4hrs
+April 1: Made a very basic version of the game with a ball and a paddle to practice using SDL and dealing with collisions -3hrs
+April 8: Added a brick to the basic game which the ball could bounce off of -2hrs
+April 16: Worked on improving collisions with bricks and paddle and fixing the ball going through objects -3hrs
+April 21-22: Fixed issue where balls bounced wrong off the bricks especially the corners. Added feature where the angle the ball bounced off the paddle changed depending on area of the paddle hit, and direction of travel of both the ball and paddle. Also added a long paddle powerup to increase the length of the paddle for a limited time. Also added a pause button. -8hrs
+April 22-23: Moved powerup bricks to a different list so that the player would not be required to clear all of them before winning the game. Added additional levels to the game. Fixed minor issues affecting consistency, and improved paddle collisions -4hrs
+April 23: Commented all of the code to make it easier to read. Went through and removed unnessesary code. -1hr
 
-Code documentation/version control:
+Code documentation/version control
 
 	TUTORIAL:
 

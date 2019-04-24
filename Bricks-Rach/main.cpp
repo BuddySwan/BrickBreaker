@@ -16,7 +16,7 @@ LTexture gLifeBrick;
 LTexture gLongBrick; //to add the long paddle powerup
 LTexture gFastBrick;
 LTexture gTextTexture; //this is what says "Score: "
-LTexture gLives;
+LTexture gLives;    //heart image
 LTexture gScoreNum;  //actual moving score 
 LTexture gLost;
 LTexture gStartWindow;
@@ -26,6 +26,7 @@ LTexture gFinalScore;
 LTexture gAngleLine;
 LTexture gHighScore;
 
+//the function to initialize SDL create the renderer and make the window
 bool init(){
 	bool success = true;
 	//initialize SDL
@@ -65,10 +66,10 @@ bool init(){
 	return success;
 }
 
-
+//function to load all the images
 bool loadMedia(){
     bool success = true;
-	
+	/*
 	if(!gStartWindow.loadFromFile("Start.png",gRenderer)){
 		printf("Failed to load start screen\n");
 		success = false;
@@ -127,7 +128,7 @@ bool loadMedia(){
 		success = false;
 	}
 	//I added new images so youll have to update those
-/*
+*/
  if(!gStartWindow.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Start.png",gRenderer)){
  printf("Failed to load start screen\n");
  success = false;
@@ -184,11 +185,11 @@ if(!gLongPaddle.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBrea
  if(!gFastBrick.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/fastBrick.png",gRenderer)){
 	printf("failed to load fast brick\n");
 	success = false;
- }*/
+ }
 
     return success;	
 }
-
+//frees all the memory used when the program closes
 void close(){
 	
 	gBackGround.free();
@@ -219,7 +220,7 @@ void close(){
 	SDL_Quit();
 }
 
-
+//the main game loop
 int main(int argc, char* argv[]){
     bool paused = false;
     bool spacePressed = false;
@@ -233,8 +234,8 @@ int main(int argc, char* argv[]){
 
 			SDL_Event e;
 
-			bool StartWindow = true, quit = false, Lose_Life = false, begin = false, GameLost = false, endGame = false;
-			int brickW = gBlueBrick.getWidth(), brickH = gBlueBrick.getHeight(), score = 0;
+            bool StartWindow = true, quit = false, Lose_Life = false, begin = false, GameLost = false;
+            int brickW = gBlueBrick.getWidth(), brickH = gBlueBrick.getHeight();
 			std::string inputText = "Score: ", scoreNum, highScore;
 
 			std::stringstream buffer;
@@ -242,24 +243,25 @@ int main(int argc, char* argv[]){
             std::list<Brick* > bricks, staticBricks, powerUps;
 			std::list<Brick* >::iterator lit;
 
-			//Lost window, will put image in later
+			//window that pops up when the user loses
 			LWindow gLostWindow;
 
 			//for displaying score
-			SDL_Color Black = {0,0,0,0}, White = {255,255,255,255};
-			TTF_Font* font = TTF_OpenFont("Roboto-Black.ttf",24);
-            //TTF_Font* font = TTF_OpenFont("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Roboto-Black.ttf",24);
-			TTF_Font* finalFont = TTF_OpenFont("Roboto-Black.ttf", 30);
-            //TTF_Font* finalFont = TTF_OpenFont("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Roboto-Black.ttf", 30);
+			SDL_Color White = {255,255,255,255};
+			//TTF_Font* font = TTF_OpenFont("Roboto-Black.ttf",24);
+            TTF_Font* font = TTF_OpenFont("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Roboto-Black.ttf",24);
+			//TTF_Font* finalFont = TTF_OpenFont("Roboto-Black.ttf", 30);
+            TTF_Font* finalFont = TTF_OpenFont("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Roboto-Black.ttf", 30);
 
 			gTextTexture.loadText(gRenderer,inputText,font, White);
 	
 
 			Paddle Paddle(gPaddle.getHeight(),gPaddle.getWidth(),gLongPaddle.getHeight(),gLongPaddle.getWidth(),0,0);
 			Ball Ball(gBall.getHeight(),gBall.getWidth(), 6, -6);
-
+            
+            //fill the bricks lists
 			createBricks(bricks, staticBricks, powerUps, Ball, Ball.Level, brickW,brickH);
-
+            //while the window is open
 			while(!quit){
 				
 					buffer.clear();
@@ -274,8 +276,8 @@ int main(int argc, char* argv[]){
 					gLost.free();
 					gFinalScore.free();
 
-					gLost.loadFromFile("lost.png", gLostWindow.mRenderer);
-                    //gLost.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/lost.png", gLostWindow.mRenderer);
+					//gLost.loadFromFile("lost.png", gLostWindow.mRenderer);
+                    gLost.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/lost.png", gLostWindow.mRenderer);
 					gFinalScore.loadText(gLostWindow.mRenderer, scoreNum, finalFont, White);
 
 					//set high score
@@ -315,10 +317,9 @@ int main(int argc, char* argv[]){
 							StartWindow = start(e);	
 						}else{
 							Paddle.handleEvent(e);
-					
+                            
 							if(begin==false){
 								begin = Ball.begin(e);
-								//Ball.ChangeAngle(e);
 							}else if(e.type == SDL_KEYDOWN && e.key.repeat==0){
                                 if(e.key.keysym.sym == SDLK_SPACE && !spacePressed){
                                     paused = !paused;
@@ -339,7 +340,7 @@ int main(int argc, char* argv[]){
 					SDL_RenderPresent(gRenderer);
 				}
 				else{
-					//if game is lost a new window pops up. it can be turned into a tutorial window or we can keep it 
+					//if game is lost a window pops up
 					if(GameLost==true){
                         Paddle.setLong(false);
                         Ball.longCount = 0;
@@ -352,13 +353,13 @@ int main(int argc, char* argv[]){
 						gLostWindow.renderImage(gHighScore,127,120);
 						
 						SDL_RenderPresent(gLostWindow.mRenderer);
-	
+
 					}else if(!paused){
 						gScoreNum.free();
 						gScoreNum.loadText(gRenderer, scoreNum, font, White);
 
 						Paddle.move();
-
+                        //runs when a life has been lost
 						if(Lose_Life==true){
 							Ball.setV(6, -6);
                             Paddle.setLong(false);
@@ -375,17 +376,12 @@ int main(int argc, char* argv[]){
 							Ball.setXY(Paddle.getX()+35, Paddle.getY()-30);
 						}
 
-			
 						SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
 						SDL_RenderClear(gRenderer);
 						SDL_SetRenderDrawColor(gRenderer,0x00,0x00,0x00,0xFF);
 
 						gBackGround.render(gRenderer,0,0);
-
-						//change launch angle the setAngle funct. isnt working though
-					//	if(begin==false){
-					//		gAngleLine.render(gRenderer,Ball.getX()-Ball.OB_WIDTH/2,Ball.getY()-Ball.OB_HEIGHT/2,NULL, Ball.Angle);
-					//	}
+                        //renders the correct paddle
                         if(Paddle.isLong){
                             Paddle.render(gLongPaddle,gRenderer);
                         }else{
@@ -393,16 +389,17 @@ int main(int argc, char* argv[]){
                         }
                         
 						Ball.render(gBall, gRenderer);
-
+                        //if all the bricks have been destroyed it moves to the next level
                         if(bricks.empty()){
                             deleteBricks(staticBricks);
                             deleteBricks(powerUps);
                             Ball.Level++;
+                            //starts over if all levels have been beaten
                             if(Ball.Level>5){
                                 Ball.Level = 1;
                             }
                             begin = false;
-                            
+                            //fills the lists with new bricks
                             createBricks(bricks, staticBricks, powerUps, Ball, Ball.Level, brickW, brickH);
                         }
                         
@@ -410,6 +407,7 @@ int main(int argc, char* argv[]){
 						for(lit = bricks.begin();lit!=bricks.end();lit++){
                             (*lit)->render(gRenderer,gBlueBrick, gPurpleBrick, gOrangeBrick);
 						}
+                        //render powerups
                         for(lit = powerUps.begin(); lit != powerUps.end(); lit++){
                             if((*lit)->PWRLife){
                                 gLifeBrick.render(gRenderer,(*lit)->x,(*lit)->y);
@@ -419,11 +417,11 @@ int main(int argc, char* argv[]){
                                 gFastBrick.render(gRenderer,(*lit)->x,(*lit)->y);
                             }
                         }
-
+                        //render static bricks
 						for(lit = staticBricks.begin();lit!=staticBricks.end();lit++){
 							gStaticBrick.render(gRenderer,(*lit)->x, (*lit)->y);
 						}
-
+                        //render the hearts
 						for(int i=0; i<Ball.Lives;i++){
 							gLives.render(gRenderer, 10 + gLives.getWidth()*i, 10);
 						}
@@ -441,7 +439,7 @@ int main(int argc, char* argv[]){
 
 			font = NULL;
 			finalFont = NULL;
-
+            //clear all the bricks
 			deleteBricks(bricks);
 			deleteBricks(staticBricks);
             deleteBricks(powerUps);

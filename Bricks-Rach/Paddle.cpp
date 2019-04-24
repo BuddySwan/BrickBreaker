@@ -1,6 +1,6 @@
 //Paddle class
 #include"head.h"
-
+//initializes the paddle with the width and height of long and short paddles and initial velocities
 Paddle::Paddle(int h, int w, int lh, int lw, int vel_x, int vel_y){
 	OB_HEIGHT = h;
 	OB_WIDTH = w;
@@ -40,18 +40,11 @@ int Paddle::getXVel(){
 }
 
 
-//controlls paddle with arrow keys
+//controlls paddle with arrow keys left and right
 void Paddle::handleEvent(SDL_Event& e){
-	//if a key was pressed
 	if(e.type == SDL_KEYDOWN && e.key.repeat==0){
-		//adjust velocity
+		//if pressed move in direction pressed
 		switch(e.key.keysym.sym){
-			case SDLK_UP:
-				mVelY -= OB_VEL;
-				break;
-			case SDLK_DOWN:
-				mVelY += OB_VEL;
-				break;
 			case SDLK_LEFT:
 				mVelX -= OB_VEL;
 				break;
@@ -59,14 +52,9 @@ void Paddle::handleEvent(SDL_Event& e){
 				mVelX += OB_VEL;
 				break;
 		}
+    //if released go back to zero
 	}else if(e.type == SDL_KEYUP && e.key.repeat==0){
 		switch(e.key.keysym.sym){
-			case SDLK_UP:
-				mVelY += OB_VEL;
-				break;
-			case SDLK_DOWN:
-				mVelY -= OB_VEL;
-				break;
 			case SDLK_LEFT:
 				mVelX += OB_VEL;
 				break;
@@ -76,7 +64,7 @@ void Paddle::handleEvent(SDL_Event& e){
 		}
 	}
 }
-
+//handles the movement of the paddle
 void Paddle::move(){
     //Move the dot left or right
     mPosX += mVelX;
@@ -90,6 +78,7 @@ void Paddle::move(){
 		}
 	
 }
+//changes the dimensions of the paddle based on whether or not it is long
 void Paddle::setLong(bool makeLong){
     if(makeLong){
         OB_WIDTH = lWidth;
@@ -110,7 +99,7 @@ void Paddle::setLong(bool makeLong){
     }
 }
 
-//I put the renderer in manually in case we want to do multiple windows for some reason 
+//renders the paddle on the screen
 void Paddle::render(LTexture& gPaddle, SDL_Renderer* gRenderer){
 	gPaddle.render(gRenderer,mPosX,mPosY);
 }

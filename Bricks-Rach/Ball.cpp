@@ -5,7 +5,7 @@
 Ball::Ball(double h, double w, double vel_x, double vel_y){
 	OB_HEIGHT = h;
 	OB_WIDTH = w;
-    //Initialize the offsets
+    //the initial position of the ball
 	mPosX = SCREEN_WIDTH/2 - w/2;
 	mPosY = SCREEN_HEIGHT - h;
 
@@ -19,7 +19,6 @@ Ball::Ball(double h, double w, double vel_x, double vel_y){
 	Level = 1;
 	MAX_VEL = 6;
 
-	Angle = 45;
     longPaddle = false;
 	faster = false;
 
@@ -44,49 +43,6 @@ void Ball::setXY(double x, double y){
 	mPosY = y;
 }
 
-//maybe my EF days have finally left me bc its not working
-/*void Ball::SetAngle(){
-	int vY = mVelY, vX = mVelX;
-	double tanA = tan((M_PI*Angle)/180);
-
-	//for some reason the tan function is STRUGGLING to calculate tan(90) so I 
-	//did it manually
-	if(Angle==90){  
-		mVelX = 0;
-	}else if(Angle==0 || Angle==180){
-		mVelY = 0;
-	}else{
-		mVelY = (vX * tanA);
-		mVelX = (vY / tanA);
-	}
-}
-
-void Ball::ChangeAngle(SDL_Event& e){
-	if(e.type == SDL_KEYDOWN && e.key.repeat == 0){
-		if(e.key.keysym.sym == SDLK_q){
-			if(Angle>0){
-				Angle -= OB_VEL;
-			}
-		}else if(e.key.keysym.sym == SDLK_w){
-			if(Angle<180){
-				Angle += OB_VEL;
-			}
-		}
-	}else if(e.type == SDL_KEYUP && e.key.repeat == 0){
-		if(e.key.keysym.sym == SDLK_q){
-			if(Angle>0){
-				Angle -= OB_VEL;
-			}
-		}else if(e.key.keysym.sym == SDLK_w){
-			if(Angle<180){
-				Angle += OB_VEL;
-			}
-		}
-	}
-//	SetAngle();
-
-}
-*/
 
 //handles reset. ball only starts moving when spacebar is pressed
 bool Ball::begin(SDL_Event& e){
@@ -103,15 +59,15 @@ bool Ball::begin(SDL_Event& e){
 }
 
 //moves ball and checks for collision. sign changes account for hitting wall or brick, and kept track of in program.
-//only handles a 90 degree turn at the moment, will make it better
+//handles bouncing off of the paddle with velocity split into x and y components based on angle
 bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, std::list<Brick* >& powerUps, Paddle& paddle){
 	std::list<Brick* >::iterator lit;
     bool top = false, lside = false, bottom = false, rside = false;
 
-	//Move the dot left or right
+	//Move ball left or right
     mPosX += mVelX;
 
-    //up or down
+    //move ball up or down
     mPosY += mVelY;
 	
 	//hits wall horizontalaly
@@ -120,45 +76,36 @@ bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, st
 		mPosX -= mVelX;
 		mVelX = -mVelX;
 
-	}else if((mPosY < 70)){   //so it doesnt overlap the lives and score
+	}else if((mPosY < 70)){   //hits top wall below score and lives
 
 		mPosY -= mVelY;
 		mVelY = -mVelY;
 
-	}else if(checkPaddleHit(paddle,top,lside)){
+	}else if(checkPaddleHit(paddle,top)){ //if it hits the paddle run the adjust angle function
         if(top){
             adjustAngle(paddle);
         }
-	}else if(mPosY + OB_HEIGHT > SCREEN_HEIGHT){
+	}else if(mPosY + OB_HEIGHT > SCREEN_HEIGHT){  //if it hits the bottom wall
 		Lives--;
 		return true;
 
     }else{
-		//check if hit with static brick
+		//checks if it hits a power up
         for(lit = powerUps.begin(); lit != powerUps.end(); lit++){
             if(checkCollide(*(*lit),top,rside,lside,bottom)){
-                
                 if((*lit)->hit==false){
                     mPosX -=mVelX;
                     mPosY -= mVelY;
                     
-                    int m = 0;
-                    
-                    if(mVelY < 0 && mVelY > -(MAX_VEL)){
-                        m = -1;
-                    }else if(mVelY > 0 && mVelY < MAX_VEL){
-                        m = 1;
-                    }
-                    
-                    if(top==true || bottom == true){
+                    if(top==true || bottom == true){    //if it hits top or bottom wall flip y velocity
                         mVelY = -(mVelY);
-                    }else if(lside == true || rside == true){
+                    }else if(lside == true || rside == true){ //if hits right or left flip x velocity
                         mVelX = -(mVelX);
                     }
-                    if((*lit)->PWRLife==true){
+                    if((*lit)->PWRLife==true){ //if powerup was life increase lives
                         Lives++;
                     }
-                    
+                    //if powerup was fast increase the max velocity and set faster flag to true
                     if((*lit)->PWRFast==true){
                         if(mVelX < 0){
                             mVelX -= 1.3;
@@ -174,7 +121,7 @@ bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, st
                         fastCount = 0;
                         
                         faster = true;
-                        
+                    //slows back down after it hits 6 bricks resets velocity after next paddle hit
                     }else if(faster){
                         fastCount++;
                         if(fastCount > 6){
@@ -183,11 +130,12 @@ bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, st
                             fastCount = 0;
                         }
                     }
-                    
+                    //if power up is long change the paddle to long
                     if((*lit)->PWRLong){
                         paddle.setLong(true);
                         longCount = 0;
                         longPaddle = true;
+                    //after 10 brick hits the paddle goes back to normal
                     }else if(longPaddle){
                         longCount++;
                         if(longCount >= 10){
@@ -196,9 +144,10 @@ bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, st
                             longCount = 0;
                         }
                     }
+                    //remove a life of the brick
                     (*lit)->takeHealth();
                     
-                    //extra points if broken
+                    //give extra points for breaking a brick
                     if((*lit)->hit==true){
                         Score += 20;
                         delete (*lit);
@@ -206,33 +155,25 @@ bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, st
                     }else{
                         Score += 5;
                     }
-                    break;
+                    break; //break out of the loop so it only checks collision once in case of two bricks both being hit
                 }
             }
         }
+        //loops through normal bricks and checks collisions
         for(lit = bricks.begin();lit != bricks.end(); lit++){
-            
             if(checkCollide(*(*lit),top,rside,lside,bottom)){
-                
                 if((*lit)->hit==false){
                     mPosX -=mVelX;
                     mPosY -= mVelY;
                     
-                    int m = 0;
-                    
-                    if(mVelY < 0 && mVelY > -(MAX_VEL)){
-                        m = -1;
-                    }else if(mVelY > 0 && mVelY < MAX_VEL){
-                        m = 1;
-                    }
-                    
-                    if(top==true || bottom == true){
+                    if(top==true || bottom == true){  //flip y velocity
                         mVelY = -(mVelY);
-                    }else if(lside == true || rside == true){
+                    }else if(lside == true || rside == true){ //flip x velocity
                         mVelX = -(mVelX);
                     }
-                    
+                    //decrease the health of the brick
                     (*lit)->takeHealth();
+                    //if the paddle is long increase the count of hits taken
                     if(longPaddle){
                         longCount++;
                         if(longCount >= 10){
@@ -241,6 +182,7 @@ bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, st
                             longCount = 0;
                         }
                     }
+                    //if it is moving faster increase the counter
                     if(faster){
                         fastCount++;
                         if(fastCount > 6){
@@ -262,15 +204,17 @@ bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, st
                 }
             }
         }
+        //check collision with the unbreakable bricks
         for(lit = staticBricks.begin();lit != staticBricks.end(); lit++){
 			if(checkCollide(*(*lit),top,rside,lside,bottom)){
 				mPosX -= mVelX;
 				mPosY -= mVelY;
-				if(top==true || bottom == true){
+				if(top==true || bottom == true){ //flip y velocity
 					mVelY = -(mVelY);
-                }else if(lside == true || rside == true){
+                }else if(lside == true || rside == true){ //flip xvelocity
 					mVelX = -(mVelX);
 				}
+                //if paddle is long increase the number of hits taken
                 if(longPaddle){
                     longCount++;
                     if(longCount >= 10){
@@ -290,7 +234,8 @@ bool Ball::move(std::list<Brick* >& bricks, std::list<Brick* >& staticBricks, st
 	return false;
 
 }
-
+//this function checks collision with a brick returns true if collided
+//Changes the four booleans to represent which side was hit
 bool Ball::checkCollide(Brick brick, bool &top, bool &rside, bool &lside, bool &bottom){
     int leftA, leftB;
     int rightA, rightB;
@@ -321,24 +266,28 @@ bool Ball::checkCollide(Brick brick, bool &top, bool &rside, bool &lside, bool &
     if( leftA >= rightB ){
 		return false;
     }
+    //if it hit the right side
     if(mPosX >= brick.x + brick.w -10 && mPosX <= brick.x + brick.w + 10 && mVelX < 0){
         rside = true;
     }
+    //if it hit the left side
     if(mPosX + OB_WIDTH <= brick.x + 10 && mPosX + OB_WIDTH >= brick.x - 10 && mVelX > 0){
 		lside = true;
     }
+    //if it hit the bottom
     if(mPosY >= brick.y + brick.h -10 && mPosY <= brick.y + brick.h + 10 && mVelY < 0){
         bottom = true;
     }
+    //if it hit the top
     if(mPosY + OB_HEIGHT <= brick.y + 10 && mPosY + OB_HEIGHT >= brick.y - 10 && mVelY > 0){
 		top = true;
 	}
-    //If none of the sides from A are outside B
+    //If it collided with the brick
     return true;
 
 }
-
-bool Ball::checkPaddleHit(Paddle pad, bool& top, bool& side){
+//this function checks for collision with the paddle
+bool Ball::checkPaddleHit(Paddle pad, bool& top){
     //The sides of the rectangles
     int leftA, leftB;
     int rightA, rightB;
@@ -357,35 +306,28 @@ bool Ball::checkPaddleHit(Paddle pad, bool& top, bool& side){
     topB = getY();
     bottomB = getY() + OB_HEIGHT;
     //If any of the sides from A are outside of B
-    if( bottomA <= topB )
-    {
+    if( bottomA <= topB ){
         return false;
     }
-
-    if( topA >= bottomB )
-    {
+    if( topA >= bottomB ){
         return false;
     }
-
-    if( rightA <= leftB )
-    {
+    if( rightA <= leftB ){
         return false;
     }
-
-    if( leftA >= rightB )
-    {
+    if( leftA >= rightB ){
         return false;
     }
-
-if(((mPosX >= pad.getX() + pad.OB_WIDTH -10 && mPosX <= pad.getX() + pad.OB_WIDTH + 10) || (mPosX + OB_WIDTH <= pad.getX() + 10 && mPosX + OB_WIDTH >= pad.getX() - 10))){
-        side = true;
+    //if the top of the paddle was hit (sides don't matter)
+    if(((mPosY + OB_HEIGHT <= pad.getY() + 15 && mPosY + OB_HEIGHT >= pad.getY() - 15))){
+        top = true;
     }
- else if(((mPosY + OB_HEIGHT <= pad.getY() + 15 && mPosY + OB_HEIGHT >= pad.getY() - 15))){
-	top = true;
-}
     //If none of the sides from A are outside B
     return true;	
 }
+//this function causes the ball to bounce at a non 90 degree angle off of the paddle
+//if the ball hits closer to the edges the angle will be shallower
+//if ball and paddle go same direction shallower angle else steeper angle
 void Ball::adjustAngle(Paddle pad){
     mPosY -= mVelY;
     double ballMid = mPosX + (OB_WIDTH / 2);
@@ -401,7 +343,7 @@ void Ball::adjustAngle(Paddle pad){
     mVelX = xDir * cos(angle) * vel;
     mVelY = -1 * sin(angle) * vel;
 }
-
+//renders the ball
 void Ball::render(LTexture& gBall, SDL_Renderer* gRenderer){
 	gBall.render(gRenderer,mPosX,mPosY);
 }

@@ -22,43 +22,41 @@ void addObject(std::list<Brick* >& objects, int x, int y, int w, int h, int hits
 //creating files 1-5, will follow this format:
 //MAX_VEL (of ball)
 //x y hits (for all bricks in level)
-//might update it so that if hits=-1 its an unbreakble one
+//if hits == -1 unbreakable     hits == -2 extra life   hits == -4 long paddle      hits == -5 fast ball
 void createBricks(std::list<Brick* >& objects, std::list<Brick* >& staticBricks, std::list<Brick* >& powerUps, Ball& Ball, int Level, int w, int h){
-    w += 3;
-    h += 3;
 	int x, y, hits;
 
 	std::ifstream fin;
 	std::string line;
 	std::istringstream buffer;
-
+    //chose the input file to read in from based on the level
 	switch(Level){
 		case 1:
-			fin.open("Level1.txt");
-            //fin.open("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Level1.txt");
+			//fin.open("Level1.txt");
+            fin.open("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Level1.txt");
 			break;
 		case 2:
-			fin.open("Level2.txt");
-            //fin.open("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Level2.txt");
+			//fin.open("Level2.txt");
+            fin.open("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Level2.txt");
 			break;
 		case 3:
-			fin.open("Level3.txt");
-            //fin.open("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Level3.txt");
+			//fin.open("Level3.txt");
+            fin.open("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Level3.txt");
 			break;
         case 4:
-            fin.open("Level4.txt");
-            //fin.open("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Level4.txt");
+            //fin.open("Level4.txt");
+            fin.open("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Level4.txt");
             break;
         case 5:
-            fin.open("Level5.txt");
-            //fin.open("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Level5.txt");
+            //fin.open("Level5.txt");
+            fin.open("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Level5.txt");
             break;
 	}
 	getline(fin,line);
 	buffer.clear();
 	buffer.str(line);
 	buffer >> Ball.MAX_VEL;
-
+    //read in the bricks from the file and add them to the correct list
 	while(getline(fin,line)){
 		buffer.clear();
 		buffer.str(line);
@@ -81,7 +79,7 @@ void createBricks(std::list<Brick* >& objects, std::list<Brick* >& staticBricks,
 	fin.close();
     
 }
-
+//remove all the bricks from the list passed in, deleting the allocated memory and clearing the list
 void deleteBricks(std::list<Brick* >&objects){
 	std::list<Brick* >::iterator lit;
 	for(lit=objects.begin();lit!=objects.end();lit++){
@@ -90,7 +88,7 @@ void deleteBricks(std::list<Brick* >&objects){
 	}
     objects.clear();
 }
-
+//start the game back over after losing
 void Reset(std::list<Brick* >& objects, std::list<Brick* >& statics, std::list<Brick* >& powerUps, Ball& ball,Paddle& paddle, int w, int h){
 	deleteBricks(objects);
 	deleteBricks(statics);
@@ -98,7 +96,6 @@ void Reset(std::list<Brick* >& objects, std::list<Brick* >& statics, std::list<B
 
 	ball.Lives = 3;
 	ball.Score = 0;
-	ball.Angle = 45;
 	ball.Level = 1;
 
 	paddle.setXY(SCREEN_WIDTH/2-paddle.OB_WIDTH/2, SCREEN_HEIGHT - paddle.OB_HEIGHT);
@@ -106,7 +103,7 @@ void Reset(std::list<Brick* >& objects, std::list<Brick* >& statics, std::list<B
 	
 	createBricks(objects, statics, powerUps, ball, ball.Level,w,h);
 }
-
+//if space bar is pressed start the ball moving
 bool start(SDL_Event& e){
 	if(e.type == SDL_KEYDOWN && e.key.repeat == 0){
 		if(e.key.keysym.sym == SDLK_RETURN){

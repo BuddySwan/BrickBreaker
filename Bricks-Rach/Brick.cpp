@@ -15,14 +15,12 @@ Brick::Brick(int bx, int by, int bw, int bh, int life){
 	PWRFast = false;
 }
 
-//essentialy just changes color to represent health loss
+//decreases the number of lives of the brick
 void Brick::takeHealth(){
-
 	Life--;
 	if(Life==0){
 		hit = true;
 	}
-	
 }
 
 //renders correct color of brick

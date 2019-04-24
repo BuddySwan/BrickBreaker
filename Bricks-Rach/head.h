@@ -1,8 +1,8 @@
 #include<SDL2/SDL.h>
-#include<SDL2/SDL_image.h>
-//#include<SDL2_image/SDL_image.h>
-#include<SDL2/SDL_ttf.h>
-//#include<SDL2_ttf/SDL_ttf.h>
+//#include<SDL2/SDL_image.h>
+#include<SDL2_image/SDL_image.h>
+//#include<SDL2/SDL_ttf.h>
+#include<SDL2_ttf/SDL_ttf.h>
 #include<cstdio>
 #include<string>
 #include<vector>
@@ -13,9 +13,7 @@
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 600;
 
-//this is so multiple windows can pop up
-//i.e tutorial window, end game window
-//idk looks cool lost.png
+//Class used to handle opening and closing of a window and rendering images to the window
 class LWindow
 {
     public:
@@ -53,6 +51,7 @@ class LWindow
 
 };
 
+//The class responsible for loading images
 class LTexture{
  public:
 	 LTexture();
@@ -75,6 +74,7 @@ class LTexture{
 
 };
 
+//This class stores a brick which has position, dimensions, state variables, and utility functions
 class Brick{
  public:
 	Brick(int,int,int,int,int); //initializes x, y, width, height
@@ -92,6 +92,9 @@ class Brick{
 	bool PWRFast;
 };
 
+//The paddle class has get and set functions for position and velocity
+//It also has a eventHandling class that moves it side to side
+//And a function to toggle long mode
 class Paddle{
  public:
 	 static const int OB_VEL = 12;
@@ -119,11 +122,11 @@ class Paddle{
     int lHeight, lWidth;
 
 };
-
+//The ball class handles all of the ball movement including collisions with the paddle, bricks and the walls
+//It has get and set functions for position and velocity, can handle key events (space bar to move)
+//it can also bounce at differing angles off of the paddle
 class Ball{
  public:
-	//arbitary num I just set; same for Paddle
-	static const int OB_VEL = 12;
 	Ball(double, double, double, double);
 
 	//get x and y positions
@@ -132,19 +135,14 @@ class Ball{
 	void setV(double, double); //set velocity
 	//resets X and Y position 
 	void setXY(double x, double y);
-	
-//	void SetAngle();  //actively changes the velocity based on angle
-//	void ChangeAngle(SDL_Event& e); //handles event to change control with Q and W
-
 	bool begin(SDL_Event &e); //controlls spacebar press that makes ball move
-    bool move(std::list<Brick* >& wall, std::list<Brick* >& statics, std::list<Brick* >& powerUps, Paddle& paddle);
-	void render(LTexture& obj, SDL_Renderer*);
+    bool move(std::list<Brick* >& wall, std::list<Brick* >& statics, std::list<Brick* >& powerUps, Paddle& paddle); //moves the ball handling collsions with walls bricks and the paddle
+	void render(LTexture& obj, SDL_Renderer*); //displays the ball on the screen
 
-	bool checkPaddleHit(Paddle, bool&, bool&);
-	bool checkCollide(Brick brick, bool&, bool&, bool&, bool&);
-    void adjustAngle(Paddle pad);
+	bool checkPaddleHit(Paddle, bool&); //checks if the ball hit the paddle
+	bool checkCollide(Brick brick, bool&, bool&, bool&, bool&); //checks if the ball hit a brick
+    void adjustAngle(Paddle pad); //used when the ball hits the paddle. handles how the ball bounces off
 
-	int Angle; 
 	int OB_HEIGHT;
 	int OB_WIDTH;
 	int Score;
@@ -162,10 +160,6 @@ class Ball{
 	double mPosX, mPosY;
 	double mVelX, mVelY;
     double vel;
-
-//	bool Bounce;
-//	int Combo;
-
 };
 
 

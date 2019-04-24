@@ -10,7 +10,7 @@ LTexture::LTexture(){
 LTexture::~LTexture(){
 	free();
 }
-
+//loads and image from a file
 bool LTexture::loadFromFile(std::string path, SDL_Renderer* gRenderer){
 	//get rid of preexisting texture
 	free();
@@ -37,7 +37,7 @@ bool LTexture::loadFromFile(std::string path, SDL_Renderer* gRenderer){
 	return mTexture != NULL;
 
 }
-
+//loads a font and prepares the text to be printed to the screen
 bool LTexture::loadText(SDL_Renderer* gRenderer, std::string text, TTF_Font* font, SDL_Color color){
 	bool success = true;
 
@@ -96,7 +96,7 @@ void LTexture::setAlpha( Uint8 alpha ){
 }
 
 
-
+//renders the texture to the screen
 void LTexture::render(SDL_Renderer* renderer, int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip ){
 	//Set rendering space and render to screen
 	SDL_Rect renderQuad = { x, y, mWidth, mHeight };

@@ -32,24 +32,24 @@ void createBricks(std::list<Brick* >& objects, std::list<Brick* >& staticBricks,
     //chose the input file to read in from based on the level
 	switch(Level){
 		case 1:
-			//fin.open("Level1.txt");
-            fin.open("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Level1.txt");
+			fin.open("Level1.txt");
+            //fin.open("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Level1.txt");
 			break;
 		case 2:
-			//fin.open("Level2.txt");
-            fin.open("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Level2.txt");
+			fin.open("Level2.txt");
+            //fin.open("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Level2.txt");
 			break;
 		case 3:
-			//fin.open("Level3.txt");
-            fin.open("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Level3.txt");
+			fin.open("Level3.txt");
+            //fin.open("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Level3.txt");
 			break;
         case 4:
-            //fin.open("Level4.txt");
-            fin.open("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Level4.txt");
+            fin.open("Level4.txt");
+            //fin.open("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Level4.txt");
             break;
         case 5:
-            //fin.open("Level5.txt");
-            fin.open("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Level5.txt");
+            fin.open("Level5.txt");
+            //fin.open("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Level5.txt");
             break;
 	}
 	getline(fin,line);

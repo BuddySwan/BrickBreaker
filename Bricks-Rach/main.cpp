@@ -69,7 +69,7 @@ bool init(){
 //function to load all the images
 bool loadMedia(){
     bool success = true;
-	/*
+
 	if(!gStartWindow.loadFromFile("Start.png",gRenderer)){
 		printf("Failed to load start screen\n");
 		success = false;
@@ -127,8 +127,7 @@ bool loadMedia(){
 		printf("failed to load fast brick\n");
 		success = false;
 	}
-	//I added new images so youll have to update those
-*/
+/*
  if(!gStartWindow.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Start.png",gRenderer)){
  printf("Failed to load start screen\n");
  success = false;
@@ -186,7 +185,7 @@ if(!gLongPaddle.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBrea
 	printf("failed to load fast brick\n");
 	success = false;
  }
-
+*/
     return success;	
 }
 //frees all the memory used when the program closes
@@ -248,10 +247,10 @@ int main(int argc, char* argv[]){
 
 			//for displaying score
 			SDL_Color White = {255,255,255,255};
-			//TTF_Font* font = TTF_OpenFont("Roboto-Black.ttf",24);
-            TTF_Font* font = TTF_OpenFont("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Roboto-Black.ttf",24);
-			//TTF_Font* finalFont = TTF_OpenFont("Roboto-Black.ttf", 30);
-            TTF_Font* finalFont = TTF_OpenFont("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Roboto-Black.ttf", 30);
+			TTF_Font* font = TTF_OpenFont("Roboto-Black.ttf",24);
+            //TTF_Font* font = TTF_OpenFont("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Roboto-Black.ttf",24);
+			TTF_Font* finalFont = TTF_OpenFont("Roboto-Black.ttf", 30);
+            //TTF_Font* finalFont = TTF_OpenFont("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/Roboto-Black.ttf", 30);
 
 			gTextTexture.loadText(gRenderer,inputText,font, White);
 	
@@ -276,8 +275,8 @@ int main(int argc, char* argv[]){
 					gLost.free();
 					gFinalScore.free();
 
-					//gLost.loadFromFile("lost.png", gLostWindow.mRenderer);
-                    gLost.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/lost.png", gLostWindow.mRenderer);
+					gLost.loadFromFile("lost.png", gLostWindow.mRenderer);
+                    //gLost.loadFromFile("/Users/buddy/Desktop/BrickBreakerProject/BrickBreakerGame/Bricks-Rach/lost.png", gLostWindow.mRenderer);
 					gFinalScore.loadText(gLostWindow.mRenderer, scoreNum, finalFont, White);
 
 					//set high score

@@ -21,8 +21,7 @@ Work and collaboration
 	MARCH 27 - SDL Tutorials, 3 hours
 	MARCH 28 - SDL Tutorials, 3 hours
 	MARCH 29 - Created my own non-related SDL game to practice 5 hours
-	APRIL 9 - Created a skeleton of the game; this included a ball that bounces off the balls and the paddle and 
-		disappears when it hits the bottom, and bricks that change color or disappear based on health 4 hours
+	APRIL 9 - Created a base version of the game we built project off; this included a ball that bounces off the balls and the 			paddle and disappears when it hits the bottom, and bricks that change color or disappear based on health 4 hours
 	APRIL 10 - Organized everything into separate files because we had started with one giant .cpp file that was not good
 		and made makefile. 1 hour
 	APRIL 15 - Put bricks in list so they could be deleted easier. Tried but failed to make angle change with key presses. Made it so ball
